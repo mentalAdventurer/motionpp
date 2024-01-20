@@ -2,6 +2,9 @@
 CC = g++
 CFLAGS = -Wall -fPIC
 
+# Library settings
+LDFLAGS = -lgsl -lgslcblas
+
 # Output directory
 OUT_DIR = ./lib
 
@@ -18,7 +21,7 @@ all: $(TARGET)
 # Rule to create the dynamic library
 $(TARGET): $(SRC) $(HEADER)
 	@mkdir -p $(OUT_DIR)
-	$(CC) $(CFLAGS) -shared -o $@ $(SRC)
+	$(CC) $(CFLAGS) -shared -o $@ $(SRC) $(LDFLAGS)
 
 # Clean up
 clean:
