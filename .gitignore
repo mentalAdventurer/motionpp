@@ -1,0 +1,70 @@
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# Debug files
+*.dSYM/
+*.su
+*.idb
+*.pdb
+
+# Dependency directories
+.deps/
+
+# Auto-generated files
+*.log
+*.aux
+*.toc
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE specific files
+# Uncomment the following line if you are using Visual Studio
+# *.sdf
+# *.opensdf
+# *.suo
+# *.user
+# *.userosscache
+# *.sln.docstates
+
+# Uncomment the following line if you are using JetBrains IDEs like CLion
+# .idea/
+
+# Uncomment the following line if you are using Eclipse
+# .cproject
+# .project
+
+# Uncomment the following line if you are using VsCode
+# .vscode/
+
+# Build files
+build/
