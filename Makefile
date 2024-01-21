@@ -12,8 +12,8 @@ OUT_DIR = ./lib
 TARGET = $(OUT_DIR)/libsimulator.so
 
 # Source and header files
-SRC = src/simulator.cpp
-HEADER = src/simulator.h
+SRC = src/simulator.cpp src/gantry.cpp
+HEADER = src/simulator.h src/gantry.h
 
 # Default target
 all: $(TARGET)
