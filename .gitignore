@@ -1,4 +1,5 @@
 # Compiled Object files
+**/.DS_Store
 *.slo
 *.lo
 *.o
@@ -13,6 +14,10 @@
 *.dylib
 *.dll
 
+# Fortran module files
+*.mod
+*.smod
+
 # Compiled Static libraries
 *.lai
 *.la
@@ -24,47 +29,30 @@
 *.out
 *.app
 
-# Debug files
-*.dSYM/
-*.su
-*.idb
-*.pdb
+**/cmake-build-debug
+**/CMakeCache.txt
+**/cmake_install.cmake
+**/install_manifest.txt
+**/CMakeFiles/
+**/CTestTestfile.cmake
+**/Makefile
+**/*.cbp
+**/CMakeScripts
+**/compile_commands.json
 
-# Dependency directories
-.deps/
+include/divisible/*
 
-# Auto-generated files
-*.log
-*.aux
-*.toc
 
-# OS generated files
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
+## Local 
 
-# IDE specific files
-# Uncomment the following line if you are using Visual Studio
-# *.sdf
-# *.opensdf
-# *.suo
-# *.user
-# *.userosscache
-# *.sln.docstates
+.idea/*.xml
 
-# Uncomment the following line if you are using JetBrains IDEs like CLion
-# .idea/
+build/**/*
 
-# Uncomment the following line if you are using Eclipse
-# .cproject
-# .project
+include/*
+lib/*
+bin/*
+test/test_runner
 
-# Uncomment the following line if you are using VsCode
-# .vscode/
-
-# Build files
-build/
+#Gtest
+.cache/
