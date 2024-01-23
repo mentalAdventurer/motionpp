@@ -1,92 +1,48 @@
 #include "simulator.h"
-#include <gsl/gsl_errno.h>
-#include <gsl/gsl_linalg.h>
-#include <gsl/gsl_odeiv2.h>
-#include <gsl/gsl_permutation.h>
+#include <cwchar>
+#include <sys/wait.h>
+#include "gantry.h"
 
-// Create a function called "simulate"
-// This function takes three c arrays of doubles as arguments
-// The arrays are u (input), x (initial state), t (time)
-// for now the function returns just an array of the same size with just zeros
-
-// ODE system function
-int double_integrator(double t, const double y[], double dydt[], void *params) {
-  double u = *(double *)params;
-  dydt[0] = y[1];
-  dydt[1] = u;
-  return GSL_SUCCESS;
+// Gantry class
+Gantry::Gantry(): A(11,11), b(11), pm(11) {
+    
 }
 
-// Simulate function
-double *simulate(double *u, double *x, double *t, int n) {
-  gsl_odeiv2_system sys = {gantry_ode, nullptr, 11, u};
+state_t Gantry::ctr_function(const state_t &x, const double t) {
+    input_t u(22);
+    for(auto &i: u) i = 0.0;
+    return u;
+}
 
-  const gsl_odeiv2_step_type *T = gsl_odeiv2_step_rk8pd;
-  gsl_odeiv2_step *s = gsl_odeiv2_step_alloc(T, 2);
-  gsl_odeiv2_control *c = gsl_odeiv2_control_y_new(1e-6, 0.0);
-  gsl_odeiv2_evolve *e = gsl_odeiv2_evolve_alloc(2);
+void Gantry::operator()(const state_t &x, state_t &dxdt, const double t) {
+    input_t u = ctr_function(x, t);
+    std::copy(x.begin()+10, x.end(), dxdt.begin());
+    this->b = this->get_accel(x,dxdt,u);
+    std::copy(this->b.begin(), this->b.end(), dxdt.begin()+10);
+}
 
-  double y[2] = {x[0], x[1]}; // Initial conditions
-  double t0 = t[0];
-  double h = 1e-6; // Initial step size
+boost::numeric::ublas::vector<double>& Gantry::get_accel(const state_t &x, const state_t &dxdt, const input_t &u) {
 
-  double *results = new double[n * 2];
-  for (int i = 0; i < n; ++i) {
-    while (t0 < t[i]) {
-      int status = gsl_odeiv2_evolve_apply(e, c, s, &sys, &t0, t[i], &h, y);
-      if (status != GSL_SUCCESS) {
-        // Handle the error, for example, break the loop
-        break;
-      }
+    init_matrix_A(this->A, x);
+    init_matrix_B(this->b, x, dxdt, u);
+
+    int singular = boost::numeric::ublas::lu_factorize(A, pm);
+    if(singular) {
+        std::cout << "Singular matrix!" << std::endl;
     }
-    results[i * 2] = y[0];
-    results[i * 2 + 1] = y[1];
-  }
-
-  gsl_odeiv2_evolve_free(e);
-  gsl_odeiv2_control_free(c);
-  gsl_odeiv2_step_free(s);
-
-  return results;
+    boost::numeric::ublas::lu_substitute(A, pm, b);
+    return b;
 }
+
+// Simulator class
+Simulator::Simulator(Gantry &gantry): system(gantry) {
+
+}
+
+state_t Simulator::integrate(state_t &x, const double dt=0.1,const double t0=0.0,const double tf=1.0) {
+    boost::numeric::odeint::integrate(this->system, x, t0, tf, dt);
+    return x;
+}
+
 
 void free_memory(double *ptr) { delete[] ptr; }
-
-// System Equations
-int gantry_ode(double t, const double y[], double dydt[], void *params) {
-  const int n = 11;
-  double *u = (double *)params;
-  // states velocities
-  for (int i = 0; i < 11; i++) {
-    dydt[i] = y[i + 11];
-  }
-
-  // states accelerations
-  gsl_matrix *A = gsl_matrix_alloc(n, n);
-  gsl_vector *b = gsl_vector_alloc(n);
-  gsl_vector *x = gsl_vector_alloc(n);
-  gsl_permutation *p = gsl_permutation_alloc(n);
-
-  // Equations system
-  // A(q)q''=b(q,qp,u) | q'' -> acceleration
-  gantry::get_matrix_A(A, y);
-  gantry::get_matrix_B(b, y, dydt, u);
-
-  // Perform LU decomposition
-  int s;
-  gsl_linalg_LU_decomp(A, p, &s);
-
-  // Solve the system
-  gsl_linalg_LU_solve(A, p, b, x);
-
-  for (int i = 0; i < n; i++) {
-    dydt[i + 11] = gsl_vector_get(x, i);
-  }
-
-  gsl_matrix_free(A);
-  gsl_vector_free(b);
-  gsl_vector_free(x);
-  gsl_permutation_free(p);
-
-  return GSL_SUCCESS;
-}

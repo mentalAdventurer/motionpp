@@ -1,14 +1,16 @@
 #ifndef GANTRY_H
 #define GANTRY_H
 
-#include <gsl/gsl_errno.h>
-#include <gsl/gsl_matrix.h>
-#include <gsl/gsl_vector.h>
-#include <math.h>
+#include "simulator.h"
+#include <boost/numeric/ublas/io.hpp>
+#include <boost/numeric/ublas/lu.hpp>
+#include <boost/numeric/ublas/matrix.hpp>
+#include <boost/numeric/ublas/vector.hpp>
+#include <sys/wait.h>
 
-namespace gantry {
-    int get_matrix_A(gsl_matrix *A, const double x[]);
-    int get_matrix_B(gsl_vector *B, const double x[], const double xp[], const double u[]);
-}
+
+int init_matrix_A(boost::numeric::ublas::matrix<double> &A, const state_t &x);
+int init_matrix_B(boost::numeric::ublas::vector<double> &b, const state_t &x, const state_t &xp, const input_t &u);
+
 
 #endif // GANTRY_H
