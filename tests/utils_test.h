@@ -3,8 +3,10 @@
 #include <string>
 #include <sstream>
 #include <cmath>
-#include <gsl/gsl_matrix.h>
+#include <boost/numeric/ublas/io.hpp>
+#include <boost/numeric/ublas/matrix.hpp>
+#include <boost/numeric/ublas/vector.hpp>
 
 
 std::vector<std::vector<double>> readMatrixFromCSV(const std::string& filename);
-bool compareMatrices(const gsl_matrix* A, const std::vector<std::vector<double>>& B, double tolerance);
+bool compareMatrices(const boost::numeric::ublas::matrix<double>& A, const std::vector<std::vector<double>>& B, double tolerance);
