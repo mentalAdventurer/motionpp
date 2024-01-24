@@ -9,8 +9,10 @@
 #include <sys/wait.h>
 
 
-int init_matrix_A(boost::numeric::ublas::matrix<double> &A, const state_t &x);
-int init_matrix_B(boost::numeric::ublas::vector<double> &b, const state_t &x, const state_t &xp, const input_t &u);
+void init_matrix_A_reduc(boost::numeric::ublas::matrix<double> &A, const state_t &x);
+void init_matrix_B_reduc(boost::numeric::ublas::vector<double> &b, const state_t &x, const state_t &xp, const input_t &u);
+int init_matrix_A_comp(boost::numeric::ublas::matrix<double> &A, const state_t &x);
+int init_matrix_B_comp(boost::numeric::ublas::vector<double> &b, const state_t &x, const state_t &xp, const input_t &u);
 
 
 #endif // GANTRY_H
