@@ -1,5 +1,4 @@
 #include "gtest/gtest.h"
-#include "gantry.h"
 #include "utils_test.h"
 #define PATH_TO_MATRIX_0 "../../tests/Matrix/test_matrix_comp_0.csv"
 #define PATH_TO_MATRIX_1 "../../tests/Matrix/test_matrix_comp_1.csv"
