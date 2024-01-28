@@ -28,15 +28,17 @@ class Voronoi{
 
 class ReachedSet{
     public:
-        ReachedSet(state_t x0, int time_steps);
+        ReachedSet(state_t x0, int time_steps, double dt);
         bool empty();
         state_t pop_state();
         input_trajectory_t pop_input();
         state_t front();
     private:
-        std::vector<state_t> reached_set;
-        std::vector<input_trajectory_t> input_set;
+        std::vector<state_t> reached_state_set;
+        std::vector<input_trajectory_t> reached_input_set;
 };
+
+std::vector<double> linspace(double start, double end, int num);
 
 }
 #endif

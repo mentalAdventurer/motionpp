@@ -33,7 +33,7 @@ Graph cell_based_sarch(cspace::state_t x0,cspace::state_t xg) {
     while(!Q.empty() && !P.target_reached()){
         cspace::state_t x_cur = Q.pop();
         int time_steps = 3;
-        cspace::ReachedSet R(x_cur,time_steps);
+        cspace::ReachedSet R(x_cur,time_steps,0.1);
         while(!R.empty()){
             if(P.visit(R.front())){
                 cspace::state_t x = R.pop_state(); 

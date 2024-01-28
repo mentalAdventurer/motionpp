@@ -62,6 +62,32 @@ bool Voronoi::target_reached(){
 }
 
 // ReachedSet class
-ReachedSet::ReachedSet(state_t x0, int time_steps){
-    GantryReduc gantry;
+ReachedSet::ReachedSet(state_t x0, int time_steps, double dt){
+    Gantry system; 
+    Simulator sim(system);
+    reached_input_set = system.generate_input_set(time_steps);
+    for(auto u : reached_input_set){
+        reached_state_set.push_back(sim.explicit_euler(x0,dt,u));
+    }
+}
+
+std::vector<double> linspace(double start, double end, int num) {
+    std::vector<double> linspaced;
+
+    if (num == 0) {
+        return linspaced; 
+    }
+    if (num == 1) {
+        linspaced.push_back(start);
+        return linspaced;
+    }
+
+    double delta = (end - start) / (num - 1);
+
+    for(int i = 0; i < num - 1; ++i) {
+        linspaced.push_back(start + delta * i);
+    }
+    linspaced.push_back(end); // Ensure the end value is exactly the end
+
+    return linspaced;
 }

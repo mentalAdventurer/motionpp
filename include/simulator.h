@@ -14,6 +14,7 @@ class Gantry{
     public:
         Gantry();
         state_t operator()(const state_t &x, const input_t &);
+        std::vector<input_trajectory_t> generate_input_set(int time_steps);
 
     private:
         //Boost Lib
@@ -23,22 +24,10 @@ class Gantry{
 
 };
 
-class System{
-    // This should be an abstract class but can't because of boost::odeint
-    // TODO: find a way to make this an abstract class
-    public:
-        virtual void operator()(const state_t &x, state_t &dxdt, const double t)=0;
-        virtual state_t operator()(const state_t &x, const input_t &u)=0;
-        virtual ~System(){};
-    protected:
-        // Acceleartion Equation
-        input_t ctr_function(const state_t &x, const double t);
-};
-
 class Simulator {
     public:
         Simulator(Gantry system) : system(system) {};
-        state_t explicit_euler(state_t &x, const double dt, const input_trajectory_t &u);
+        state_t explicit_euler(const state_t& x0, const double dt, const input_trajectory_t& u);
     private:
         Gantry system;
 };
