@@ -1,12 +1,10 @@
-#include "simulator.h"
-#include <boost/numeric/ublas/io.hpp>
-#include <boost/numeric/ublas/lu.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/vector.hpp>
 #include <sys/wait.h>
+#include "cspace.h"
 
 
-void init_matrix_A_reduc(boost::numeric::ublas::matrix<double> &A, const state_t &x){
+void init_matrix_A_reduc(boost::numeric::ublas::matrix<double> &A, const cspace::state_t &x){
     A(0,0) = 0.71111111111111114*pow(x[6], 2) + 0.58666666666666667*x[6] + 0.71111111111111114*pow(x[7], 2) + 0.58666666666666667*x[7] + 12.073570303764919;
     A(0,1) = -0.71111111111111114*pow(x[6], 2) - 0.71111111111111114*pow(x[7], 2) + 0.6560296962350779;
     A(0,2) = 0.71111111111111114*pow(x[6], 2) + 0.58666666666666667*x[6] + 3.4509851518824606;
@@ -73,7 +71,7 @@ void init_matrix_A_reduc(boost::numeric::ublas::matrix<double> &A, const state_t
     A(7,7) = 0.71111111111111114*pow(x[0] - x[1] + x[4] - x[5], 2) + 0.48399999999999999;
 }
 
-void init_matrix_B_reduc(boost::numeric::ublas::vector<double> &b, const state_t &x, const state_t &xp, const input_t &u) {
+void init_matrix_B_reduc(boost::numeric::ublas::vector<double> &b, const cspace::state_t &x, const cspace::state_t &xp, const cspace::input_t &u) {
     double Qmmr1 = u[2];
     double Qmmf1 = u[3];
     double Qmmr2 = u[4];
@@ -90,7 +88,7 @@ void init_matrix_B_reduc(boost::numeric::ublas::vector<double> &b, const state_t
     b(7) = Qmb2 - 1.4222222222222223*xp[7]*(x[0] - x[1] + x[4] - x[5])*(xp[0] - xp[1] + xp[4] - xp[5]);
 }
 
-int init_matrix_A_comp(boost::numeric::ublas::matrix<double> &A, const state_t &x) {
+int init_matrix_A_comp(boost::numeric::ublas::matrix<double> &A, const cspace::state_t &x) {
   A(0, 0) = 47.76489999999999;
   A(0, 1) = 0;
   A(0, 2) = -0.48399999999999999 * x[10] + 0.019359999999999999 * x[3] - 0.019359999999999999 * x[4] + 0.0096799999999999994 * x[5] - 0.0096799999999999994 * x[6] + 0.0096799999999999994 * x[7] - 0.0096799999999999994 * x[8] - 0.48399999999999999 * x[9] - 1.0143787500000001;
@@ -215,7 +213,7 @@ int init_matrix_A_comp(boost::numeric::ublas::matrix<double> &A, const state_t &
   return 0;
 }
 
-int init_matrix_B_comp(boost::numeric::ublas::vector<double> &b, const state_t &x, const state_t &xp, const input_t &u) {
+int init_matrix_B_comp(boost::numeric::ublas::vector<double> &b, const cspace::state_t &x, const cspace::state_t &xp, const cspace::input_t &u) {
   double Qmmr1 = u[5];
   double Qmmf1 = u[6];
   double Qmmr2 = u[7];

@@ -4,10 +4,9 @@
 #include <cwchar>
 #include <vector>
 #include <boost/numeric/odeint.hpp>
+#include <cspace.h>
 
-typedef std::vector<double> state_t;
-typedef std::vector<double> input_t;
-typedef std::vector<double> trajectory_t;
+using namespace cspace;
 
 class System{
     // This should be an abstract class but can't because of boost::odeint

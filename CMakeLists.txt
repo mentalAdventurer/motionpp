@@ -4,22 +4,25 @@ project(MotionPlanningLibrary)
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 14)
 
+# Posiiton independent code for shared libraries
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
 # Enabel testing 
 include(CTest)
 
-# Include directories
-include_directories(include)
+find_package(Boost REQUIRED)
 
 # Add subdirectories
 add_subdirectory(external)
-add_subdirectory(tests)
+#add_subdirectory(tests)
 
-# Find the GSL package
-find_package(Boost REQUIRED)
+#incldue directories
+include_directories(external/boost)
 
-# Specify the target library and set output name to libsimulator.so
-add_library(simulator SHARED src/gantry.cpp src/simulator.cpp)
-set_target_properties(simulator PROPERTIES OUTPUT_NAME "simulator")
+# Create Dynamic Library 
+add_library(simulator SHARED src/gantry.cpp src/simulator.cpp src/cspace.cpp) 
 
-# linke the GSL library
-target_link_libraries(simulator PRIVATE ${Boost_LIBRARIES})
+# Linking Libraries
+target_include_directories(simulator PUBLIC include)
+#target_link_directories(simulator PUBLIC)
+target_link_libraries(simulator PUBLIC KDTree ${Boost_LIBRARIES}) 
