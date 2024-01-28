@@ -26,7 +26,6 @@ class Voronoi{
 };
 
 
-/*
 class ReachedSet{
     public:
         ReachedSet(state_t x0, int time_steps);
@@ -38,7 +37,6 @@ class ReachedSet{
         std::vector<state_t> reached_set;
         std::vector<input_trajectory_t> input_set;
 };
-*/
 
 }
 #endif

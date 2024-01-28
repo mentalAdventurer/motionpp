@@ -1,5 +1,6 @@
 #include "cspace.h"
 #include <random> 
+#include <simulator.h>
 
 using namespace cspace;
 
@@ -58,4 +59,9 @@ state_t Voronoi::random_state(const std::size_t state_dim){
 
 bool Voronoi::target_reached(){
     return points_visited[xg_index];
+}
+
+// ReachedSet class
+ReachedSet::ReachedSet(state_t x0, int time_steps){
+    GantryReduc gantry;
 }
