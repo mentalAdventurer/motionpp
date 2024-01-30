@@ -11,7 +11,8 @@
         - [x] Tested
     - [ ] Directed discretisation  
         - [ ] Tested
-- [ ] Graph
+- [x] Graph
+    - [x] Hash function
     - [ ] Tested
 - [ ] Queue
     - [ ] Kosten Funktion

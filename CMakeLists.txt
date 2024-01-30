@@ -27,7 +27,7 @@ add_subdirectory(external)
 include_directories(external/boost)
 
 # Create Dynamic Library 
-add_library(simulator SHARED src/gantry.cpp src/simulator.cpp src/cspace.cpp) 
+add_library(simulator SHARED src/gantry.cpp src/simulator.cpp src/cspace.cpp src/graph.cpp) 
 
 # Linking Libraries
 target_include_directories(simulator PUBLIC include)
