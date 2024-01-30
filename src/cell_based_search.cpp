@@ -25,7 +25,6 @@ class Queue{
 
 
 Graph cell_based_sarch(cspace::state_t x0,cspace::state_t xg) {
-    std::size_t state_dim = x0.size();
     Graph G(x0);
     Queue Q(x0);
     cspace::Voronoi P(10000,x0,xg);
@@ -49,4 +48,3 @@ Graph cell_based_sarch(cspace::state_t x0,cspace::state_t xg) {
     }
     return G;
 }
-

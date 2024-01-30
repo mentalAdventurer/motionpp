@@ -12,13 +12,13 @@ state_t Gantry::operator()(const state_t &x, const input_t &u) {
     // Velocity
     std::copy(x.begin()+state_dim/2, x.end(), dxdy.begin());
     // Acceleration
-    auto qdot = get_accel(x,dxdy,u);
+    auto qdot = get_accel(x,u);
     std::copy(qdot.begin(), qdot.end(), dxdy.begin()+state_dim/2);
 
     return dxdy;
 }
 
-boost::numeric::ublas::vector<double> Gantry::get_accel(const state_t &x, const state_t &dxdt, const input_t &u) {
+boost::numeric::ublas::vector<double> Gantry::get_accel(const state_t &x, const input_t &u) {
     auto A = get_accel_matrix_A(x);
     auto b = get_accel_vector_B(x,u);
    
@@ -47,7 +47,7 @@ state_t Simulator::explicit_euler(const state_t &x0, const double dt, const inpu
     state_t xk(x0.size());
     for(auto ui : u){
         state_t dxdt = system(x,ui);
-        for(int i = 0;i<xk.size();i++) xk[i] = x[i] + dt*dxdt[i]; 
+        for(std::size_t i = 0;i < xk.size();i++) xk[i] = x[i] + dt*dxdt[i];
         x = xk;
     }
     

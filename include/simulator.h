@@ -18,7 +18,7 @@ class Gantry{
 
     private:
         //Boost Lib
-        boost::numeric::ublas::vector<double> get_accel(const state_t &x, const state_t &dxdt, const input_t &u);
+        boost::numeric::ublas::vector<double> get_accel(const state_t &x, const input_t &u);
         boost::numeric::ublas::matrix<double> get_accel_matrix_A(const state_t &q);
         boost::numeric::ublas::vector<double> get_accel_vector_B(const state_t &x, const input_t &u);
 

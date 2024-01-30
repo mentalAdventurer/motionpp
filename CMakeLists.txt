@@ -7,6 +7,13 @@ set(CMAKE_CXX_STANDARD 14)
 # Posiiton independent code for shared libraries
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
+# Set Warning Level
+if (MSVC)
+    add_compile_options(/W4)
+else()
+    add_compile_options(-Wall -Wextra -pedantic)
+endif()
+
 # Enabel testing 
 include(CTest)
 
