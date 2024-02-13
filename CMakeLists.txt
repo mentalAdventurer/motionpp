@@ -22,14 +22,15 @@ find_package(Boost REQUIRED)
 # Add subdirectories
 add_subdirectory(external)
 #add_subdirectory(tests)
+add_subdirectory(examples)
 
 #incldue directories
 include_directories(external/boost)
 
 # Create Dynamic Library 
-add_library(simulator SHARED src/gantry.cpp src/simulator.cpp src/cspace.cpp src/graph.cpp) 
+add_library(CellBasedSearch SHARED src/gantry.cpp src/simulator.cpp src/cspace.cpp src/graph.cpp) 
 
 # Linking Libraries
-target_include_directories(simulator PUBLIC include)
+target_include_directories(CellBasedSearch PUBLIC include)
 #target_link_directories(simulator PUBLIC)
-target_link_libraries(simulator PUBLIC KDTree ${Boost_LIBRARIES}) 
+target_link_libraries(CellBasedSearch PUBLIC KDTree ${Boost_LIBRARIES}) 
