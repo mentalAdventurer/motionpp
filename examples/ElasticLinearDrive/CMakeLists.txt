@@ -3,6 +3,8 @@ project(ElasticLinearDrive)
 
 set(CMAKE_CXX_STANDARD 20)
 
+find_package(Matplot++ REQUIRED)
+
 add_executable(ElasticLinearDrive main.cpp ElasticLinearDrive.cpp)
-target_link_libraries(ElasticLinearDrive CellBasedSearch)
+target_link_libraries(ElasticLinearDrive CellBasedSearch Matplot++::matplot)
 
