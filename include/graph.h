@@ -39,4 +39,18 @@ class Graph{
         
 };
 
+struct Graph::Vertex {
+    cspace::state_t state;
+    std::list<Edge*> edges_out;
+    Edge* edge_in = nullptr;
+    Vertex(const cspace::state_t& x) : state(x) {}
+};
+
+struct Graph::Edge {
+    Vertex* source;
+    Vertex* target;
+    cspace::input_trajectory_t input;
+    Edge(Vertex* s, Vertex* t, const cspace::input_trajectory_t& u) : source(s), target(t), input(u) {}
+};
+
 #endif // GRAPH_H
