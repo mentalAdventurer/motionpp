@@ -3,7 +3,9 @@
 ## Progress
 - [x] Model
     - [x] Design Reduced Model
-    - [ ] Tested
+        - [ ] Tested
+    - [ ] Benchmark Model ElasticLinearDrive
+        - [x] Tested
 - [x] Integrator
     - [ ] Tested
 - [x] Voronoi (Dirichlet-Zerlegung des Konfigurationsraumes)
@@ -13,7 +15,7 @@
         - [ ] Tested
 - [x] Graph
     - [x] Hash function
-    - [ ] Tested
+    - [x] Tested
 - [ ] Queue
     - [ ] Kosten Funktion
         - [ ] Tested
