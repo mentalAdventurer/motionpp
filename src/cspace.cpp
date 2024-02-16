@@ -62,14 +62,6 @@ bool Voronoi::target_reached(){
 }
 
 // ReachedSet class
-ReachedSet::ReachedSet(state_t x0, int time_steps, double dt){
-    Gantry system; 
-    Simulator sim(system);
-    reached_input_set = system.generate_input_set(time_steps);
-    for(auto u : reached_input_set){
-        reached_state_set.push_back(sim.explicit_euler(x0,dt,u));
-    }
-}
 
 std::vector<double> linspace(double start, double end, int num) {
     std::vector<double> linspaced;
