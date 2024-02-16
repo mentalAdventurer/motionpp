@@ -21,7 +21,7 @@ find_package(Boost REQUIRED)
 
 # Add subdirectories
 add_subdirectory(external)
-#add_subdirectory(tests)
+add_subdirectory(tests)
 add_subdirectory(examples)
 
 #incldue directories
