@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 project(MotionPlanningLibrary)
 
 # Set C++ standard
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
 # Posiiton independent code for shared libraries
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
@@ -28,7 +28,12 @@ add_subdirectory(examples)
 include_directories(external/boost)
 
 # Create Dynamic Library 
-add_library(CellBasedSearch SHARED src/gantry.cpp src/simulator.cpp src/cspace.cpp src/graph.cpp) 
+add_library(CellBasedSearch SHARED 
+    src/gantry.cpp 
+    src/simulator.cpp 
+    src/cspace.cpp 
+    src/queue.cpp
+    src/graph.cpp) 
 
 # Linking Libraries
 target_include_directories(CellBasedSearch PUBLIC include)
