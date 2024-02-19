@@ -30,15 +30,17 @@ class ReachedSet {
  public:
   ReachedSet(std::function<cspace::state_t(const cspace::state_t&, const cspace::input_t&)> dynamics,
              std::function<std::vector<cspace::input_trajectory_t>(const cspace::state_t&)> motionPrimitive);
-  void operator()(state_t x0, int time_steps, double dt);
+  void operator()(std::shared_ptr<const state_t> x0, const int time_steps, const double dt);
   bool empty();
   state_t pop_state();
   input_trajectory_t pop_input();
+  std::shared_ptr<const state_t> pop_state_ptr();
+  std::shared_ptr<const input_trajectory_t> pop_input_ptr();
   state_t front();
 
  private:
-  std::vector<state_t> reached_state_set;
-  std::vector<input_trajectory_t> reached_input_set;
+  std::vector<std::shared_ptr<state_t>> reached_state_set;
+  std::vector<std::shared_ptr<input_trajectory_t>> reached_input_set;
 };
 
 std::vector<double> linspace(double start, double end, int num);
