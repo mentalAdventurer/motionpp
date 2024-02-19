@@ -10,12 +10,13 @@ Graph cellBasedSearch(
     const cspace::state_t& x0, const cspace::state_t& xg,
     std::function<cspace::state_t(const cspace::state_t&, const cspace::input_t&)> dynamics,
     std::function<std::vector<cspace::input_trajectory_t>(const cspace::state_t&)> motionPrimitive) {
-
-  std::shared_ptr<const cspace::state_t> x0_ptr = std::make_shared<const cspace::state_t>(x0);
+    
+  namespace cs = cspace;
+  cs::state_ptr x0_ptr = std::make_shared<const cs::state_t>(x0);
   Graph G(x0_ptr);
   Queue Q(x0_ptr);
-  cspace::Voronoi P(10000, x0, xg);
-  cspace::ReachedSet R(dynamics, motionPrimitive);
+  cs::Voronoi P(10000, x0, xg);
+  cs::ReachedSet R(dynamics, motionPrimitive);
   while (!Q.empty() && !P.target_reached()) {
     const auto [x_cur_ptr, cost] = Q.pop();
     int time_steps = 3;
