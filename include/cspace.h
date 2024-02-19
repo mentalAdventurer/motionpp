@@ -9,6 +9,8 @@ typedef std::vector<double> state_t;
 typedef std::vector<double> input_t;
 typedef std::vector<std::vector<double>> trajectory_t;
 typedef std::vector<std::vector<double>> input_trajectory_t;
+typedef std::shared_ptr<const state_t> state_ptr;
+typedef std::shared_ptr<const input_trajectory_t> input_traj_ptr;
 
 class Voronoi {
  public:
