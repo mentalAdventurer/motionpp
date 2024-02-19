@@ -17,16 +17,16 @@ Graph cellBasedSearch(
   cspace::Voronoi P(10000, x0, xg);
   cspace::ReachedSet R(dynamics, motionPrimitive);
   while (!Q.empty() && !P.target_reached()) {
-    const auto [x_cur, cost] = Q.pop();
+    const auto [x_cur_ptr, cost] = Q.pop();
     int time_steps = 3;
-    R(x_cur, time_steps, 0.1);
+    R(x_cur_ptr, time_steps, 0.1);
     while (!R.empty()) {
       if (P.visit(R.front())) {
-        auto x = R.pop_state_ptr();
-        auto u = R.pop_input_ptr();
-        Q.push(x, u, cost);
-        G.add_vertex(x);
-        G.add_edge(x_cur, x, u);
+        auto x_ptr = R.pop_state_ptr();
+        auto u_ptr = R.pop_input_ptr();
+        Q.push(x_ptr, u_ptr, cost);
+        G.add_vertex(x_ptr);
+        G.add_edge(x_cur_ptr, x_ptr, u_ptr);
       }
     }
   }
