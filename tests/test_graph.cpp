@@ -4,39 +4,42 @@
 namespace cs = cspace;
 
 TEST(Graph, addEdge) {
-  cs::state_t x0 = {0, 0};
-  cs::state_t x1 = {1, 1};
-  cs::state_t x2 = {-1, -2};
+  auto x0_ptr = std::make_shared<cs::state_t>(cs::state_t{0, 0});
+  auto x1_ptr = std::make_shared<cs::state_t>(cs::state_t{1, 1});
+  auto x2_ptr = std::make_shared<cs::state_t>(cs::state_t{-1, -2});
   cs::input_trajectory_t u = {{1, 0}, {0, 1}};
-  Graph G(x0);
-  G.add_vertex(x1);
-  G.add_edge(x0, x1, u);
-  G.add_vertex(x2);
-  G.add_edge(x1, x2, u);
-  G.add_edge(x0, x2, u);
+  auto u_ptr = std::make_shared<cs::input_trajectory_t>(u);
+
+  Graph G(x0_ptr);
+  G.add_vertex(x1_ptr);
+  G.add_vertex(x2_ptr);
+  G.add_edge(x1_ptr, x2_ptr, u_ptr);
+  G.add_edge(x1_ptr, x2_ptr, u_ptr);
+  G.add_edge(x0_ptr , x2_ptr, u_ptr);
 }
 
 TEST(Graph, addVertex) {
-  cs::state_t x0 = {0, 0};
-  Graph G(x0);
-  G.add_vertex({0, 0});
-  G.add_vertex({1, 1});
+  auto x0_ptr = std::make_shared<cs::state_t>(cs::state_t{0, 0});
+  auto x1_ptr = std::make_shared<cs::state_t>(cs::state_t{1, 1});
+  Graph G(x0_ptr);
+  G.add_vertex(x0_ptr);
+  G.add_vertex(x1_ptr);
 }
 
 TEST(Graph, getInput) {
-  cs::state_t x0 = {0, 0};
-  cs::state_t x1 = {1, 1};
-  cs::state_t x2 = {-1, -2};
-  cs::input_trajectory_t u = {{1, 0}, {0, 1}, {1, 1}};
-  Graph G(x0);
-  G.add_vertex(x1);
-  G.add_edge(x0, x1, u);
-  G.add_vertex(x2);
-  G.add_edge(x1, x2, u);
-  auto path = G.get_input(x2);
-  std::list<cs::input_t> expected = {{1, 0}, {0, 1}, {1, 1}, {1, 0}, {0, 1}, {1, 1}};
-
-  EXPECT_EQ(path.size(), 6);
+  auto x0_ptr = std::make_shared<cs::state_t>(cs::state_t{0, 0});
+  auto x1_ptr = std::make_shared<cs::state_t>(cs::state_t{1, 1});
+  auto x2_ptr = std::make_shared<cs::state_t>(cs::state_t{-1, -2});
+  cs::input_trajectory_t u = {{1, 1}, {0, 0}, {0,1}, {1, 0}};
+  auto u_ptr = std::make_shared<cs::input_trajectory_t>(u);
+  Graph G(x0_ptr);
+  G.add_vertex(x1_ptr);
+  G.add_edge(x0_ptr, x1_ptr, u_ptr);
+  G.add_vertex(x2_ptr);
+  G.add_edge(x1_ptr, x2_ptr, u_ptr);
+  auto path = G.get_input(x2_ptr);
+  std::list<cs::input_t> expected = {{1, 1}, {0, 0}, {0,1}, {1, 0}, {1, 1}, {0, 0}, {0,1}, {1, 0}};
+  EXPECT_EQ(path.size(), 8);
   if (!std::equal(expected.begin(), expected.end(), path.begin(), path.end())) {
     FAIL() << "Path is not as expected";
   }
