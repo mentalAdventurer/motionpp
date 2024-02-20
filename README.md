@@ -16,11 +16,12 @@
 - [x] Graph
     - [x] Hash function
     - [x] Tested
-- [ ] Queue
-    - [ ] Kosten Funktion
-        - [ ] Tested
-    - [ ] Sortier Algorithmus
-        - [ ] Tested
+- [x] Queue
+    - [x] Kosten Funktion
+        - [x] Tested
+    - [x] Sortier Algorithmus
+        - [x] Tested
+    - [ ] Option Metric Überladen Konstruktor
 - [ ] Collision Detection (impl. Voronoi | ReachedSet)
     - [ ] Minkoski Sum
 - [ ] ReachedSet
