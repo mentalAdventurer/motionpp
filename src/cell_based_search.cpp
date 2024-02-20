@@ -10,7 +10,6 @@ Graph cellBasedSearch(
     const cspace::state_t& x0, const cspace::state_t& xg,
     std::function<cspace::state_t(const cspace::state_t&, const cspace::input_t&)> dynamics,
     std::function<std::vector<cspace::input_trajectory_t>(const cspace::state_t&)> motionPrimitive) {
-    
   namespace cs = cspace;
   cs::state_ptr x0_ptr = std::make_shared<const cs::state_t>(x0);
   Graph G(x0_ptr);
@@ -24,8 +23,8 @@ Graph cellBasedSearch(
     while (!R.empty()) {
       if (P.visit(R.front())) {
         auto x_ptr = R.pop_state_ptr();
-        auto u_ptr = R.pop_input_ptr();
-        Q.push(x_ptr, u_ptr, cost);
+        auto [u_ptr, time] = R.pop_input_ptr();
+        Q.push(x_ptr, cost, u_ptr, time);
         G.add_vertex(x_ptr);
         G.add_edge(x_cur_ptr, x_ptr, u_ptr);
       }
