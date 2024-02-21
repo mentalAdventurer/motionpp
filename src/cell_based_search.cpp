@@ -6,10 +6,8 @@
 #include "graph.h"
 #include "queue.h"
 
-Graph cellBasedSearch(
-    const cspace::state_t& x0, const cspace::state_t& xg,
-    std::function<cspace::state_t(const cspace::state_t&, const cspace::input_t&)> dynamics,
-    std::function<std::vector<cspace::input_trajectory_t>(const cspace::state_t&)> motionPrimitive) {
+Graph cellBasedSearch(const cspace::state_t& x0, const cspace::state_t& xg, cspace::fun_dyn dynamics,
+                      cspace::fun_reached motionPrimitive) {
   namespace cs = cspace;
   cs::state_ptr x0_ptr = std::make_shared<const cs::state_t>(x0);
   Graph G(x0_ptr);
@@ -18,8 +16,7 @@ Graph cellBasedSearch(
   cs::ReachedSet R(dynamics, motionPrimitive);
   while (!Q.empty() && !P.target_reached()) {
     const auto [x_cur_ptr, cost] = Q.pop();
-    int time_steps = 3;
-    R(x_cur_ptr, time_steps, 0.1);
+    R(x_cur_ptr);
     while (!R.empty()) {
       if (P.visit(R.front())) {
         auto x_ptr = R.pop_state_ptr();
