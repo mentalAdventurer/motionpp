@@ -17,20 +17,13 @@ endif()
 # Enabel testing 
 include(CTest)
 
-find_package(Boost REQUIRED)
-
 # Add subdirectories
 add_subdirectory(external)
 add_subdirectory(tests)
 add_subdirectory(examples)
 
-#incldue directories
-include_directories(external/boost)
-
 # Create Dynamic Library 
 add_library(CellBasedSearch SHARED 
-    src/gantry.cpp 
-    src/simulator.cpp 
     src/cspace.cpp 
     src/queue.cpp
     src/graph.cpp) 
@@ -38,4 +31,4 @@ add_library(CellBasedSearch SHARED
 # Linking Libraries
 target_include_directories(CellBasedSearch PUBLIC include)
 #target_link_directories(simulator PUBLIC)
-target_link_libraries(CellBasedSearch PUBLIC KDTree ${Boost_LIBRARIES}) 
+target_link_libraries(CellBasedSearch PUBLIC KDTree) 
