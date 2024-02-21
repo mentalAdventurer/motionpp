@@ -25,7 +25,9 @@ Voronoi::Voronoi(const std::size_t N, state_t x0, state_t xg) {
   // Create the kdTree
   kdtree = new KDTree(points);
 }
+
 Voronoi::~Voronoi() { delete kdtree; }
+
 bool Voronoi::visit(state_t x) {
   // Find the nearest neighbor to 'x' using the kdTree
   int nearestIndex = kdtree->nearest_index(x);
@@ -53,17 +55,15 @@ state_t Voronoi::random_state(const std::size_t state_dim) {
 bool Voronoi::target_reached() { return points_visited[xg_index]; }
 
 // ReachedSet
-
 ReachedSet::ReachedSet(fun_dyn dynamics, fun_reached motionPrimitive)
     : dynamics(dynamics), motionPrimitive(motionPrimitive) {}
 
-void ReachedSet::operator()(const state_ptr& x_ptr) {
+void ReachedSet::operator()(const state_ptr x_ptr) {
   auto [inputs, time] = motionPrimitive(*x_ptr);
   auto inputs_size = inputs.size();
   auto state_dim = x_ptr->size();
   auto num_primitive = time.size();
   auto traj_size = inputs_size / num_primitive / state_dim;
-
   // Motion Primitive Loop
   for (std::size_t i = 0; i < num_primitive; i++) {
     const auto dt = time[i] / traj_size;
@@ -77,6 +77,8 @@ void ReachedSet::operator()(const state_ptr& x_ptr) {
   }
 }
 
+bool ReachedSet::empty() { return states.empty(); }
+
 std::vector<double> ReachedSet::eulerIntegrate(std::vector<double>::const_iterator x0,
                                                std::vector<double>::const_iterator u_traj,
                                                std::size_t state_dim, std::size_t traj_dim, float dt) {
@@ -89,7 +91,6 @@ std::vector<double> ReachedSet::eulerIntegrate(std::vector<double>::const_iterat
       x_traj[(j + 1) * state_dim + k] = x_traj[j * state_dim + k] + dxdt[k] * dt;
     }
   }
-
   return x_traj;
 }
 bool ReachedSet::collision(std::vector<double> x, std::size_t state_dim) { return false; }
@@ -106,6 +107,28 @@ void ReachedSet::add_reached_input(std::vector<double>::const_iterator first, fl
 
   times.push_back(time);
   input_traj.push_back(std::move(input_ptr));
+}
+
+std::shared_ptr<const state_t> ReachedSet::pop_state_ptr() {
+  auto x_ptr = states.back();
+  states.pop_back();
+  return x_ptr;
+}
+
+InputTrajPtrTimePair ReachedSet::pop_input_ptr() {
+  auto input_ptr = input_traj.back();
+  input_traj.pop_back();
+  auto time = times.back();
+  times.pop_back();
+  return std::make_pair(input_ptr, time);
+}
+
+state_t ReachedSet::front() { return *states.front(); }
+
+void ReachedSet::clear() {
+  states.clear();
+  input_traj.clear();
+  times.clear();
 }
 
 std::vector<std::vector<double>> ReachedSet::convertTo2D(std::vector<double>::const_iterator first,
