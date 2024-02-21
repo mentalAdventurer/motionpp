@@ -1,6 +1,6 @@
 if(BUILD_TESTING)
     find_package(Boost REQUIRED)
-    add_executable(tests utils_test.cpp test_graph.cpp test_queue.cpp)
+    add_executable(tests utils_test.cpp test_graph.cpp test_queue.cpp test_ReachedSet.cpp)
 
     target_link_libraries(tests PUBLIC GTest::gtest_main CellBasedSearch)
 
