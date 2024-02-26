@@ -1,10 +1,12 @@
 #include "cspace.h"
+#include <algorithm>
 
 using namespace cspace;
 
 Voronoi::Voronoi(const std::size_t N, state_t x0, state_t xg) {
   points.resize(N + 2);
   points[0] = x0;
+  state_limit.resize(x0.size());
 
   // Add the goal point to the points vector
   this->xg_index = 1;  // Store index for check in target_reached()
@@ -16,11 +18,13 @@ Voronoi::Voronoi(const std::size_t N, state_t x0, state_t xg) {
   for (std::size_t i = 0; i < state_dim; i++) {
     state_limit[i] = 10;
   }
-  state_limit[0] = 1.2;
-  state_limit[1] = 1.2;
 
   // Generate N random points
   for (std::size_t i = 0; i < N; i++) points[i + 2] = this->random_state(state_dim);
+
+  // Initialize the points_visited vector
+  points_visited.resize(points.size());
+  std::fill(points_visited.begin(), points_visited.end(), false);
 
   // Create the kdTree
   kdtree = new KDTree(points);
