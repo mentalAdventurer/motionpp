@@ -24,6 +24,7 @@ add_subdirectory(examples)
 
 # Create Dynamic Library 
 add_library(CellBasedSearch SHARED 
+    src/cell_based_search.cpp
     src/cspace.cpp 
     src/queue.cpp
     src/graph.cpp) 
