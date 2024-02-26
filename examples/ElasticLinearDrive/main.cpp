@@ -1,12 +1,11 @@
-#include "ElasticLinearDrive.h"
-#include <iostream>
 #include <matplot/matplot.h>
+
+#include <iostream>
+
+#include "ElasticLinearDrive.h"
 #include "cell_based_search.h"
 
-
-
-void plotTrajectory(const std::vector<std::vector<double>> &traj,
-                    const double &time) {
+void plotTrajectory(const std::vector<std::vector<double>> &traj, const double &time) {
   using namespace matplot;
 
   // Calculate Time
@@ -28,8 +27,7 @@ void plotTrajectory(const std::vector<std::vector<double>> &traj,
   // Create time vector size of s
   std::vector<double> t(steps);
   t[0] = 0;
-  for (auto it = t.begin() + 1; it != t.end(); it++)
-    *it = *(it - 1) + dt;
+  for (auto it = t.begin() + 1; it != t.end(); it++) *it = *(it - 1) + dt;
 
   plot(t, s);
   show();
@@ -38,21 +36,23 @@ void plotTrajectory(const std::vector<std::vector<double>> &traj,
 int main() {
   using namespace matplot;
   std::vector<double> x = {0, 0, 0, 0};
-  std::vector<double> xg = {1, 0, 0, 0};
-  double time = 30;
+  std::vector<double> xg = {0, 0, 4, 0};
+
   // auto motion_primtives = ElasticLinearDrive::getMotionPrimitives(x);
-  cs::input_trajectory_t input_trajectory =
-      ElasticLinearDrive::getInputTrajector(100000);
+  cs::input_trajectory_t input_trajectory = ElasticLinearDrive::getInputTrajector(100000);
 
-  auto x_traj = ElasticLinearDrive::eulerIntegrate(x, input_trajectory, time);
-  auto G = cellBasedSearch(x, xg, ElasticLinearDrive::dynamics,
-                           ElasticLinearDrive::getMotionPrimitives);
+  // Set Configuration Space limits
+  cs::Options opt(1000, {
+                            std::make_pair(-10, 10),
+                            std::make_pair(-1000, 1000),
+                            std::make_pair(-10, 10),
+                            std::make_pair(-1000, 1000),
+                        });
 
-  // Print the trajectory
-  std::cout << "Trajectory: " << xg.size() << std::endl;
+  auto G = cellBasedSearch(x, xg, ElasticLinearDrive::dynamics, ElasticLinearDrive::getMotionPrimitives, opt);
 
-  // Plot the trajectory
-  //plotTrajectory(xg, time);
+  std::cout << "Success: " << G.get_success() << std::endl;
+  std::cout << "Number of Vertices: " << G.size_vertices() << std::endl;
 
   return 0;
 }
