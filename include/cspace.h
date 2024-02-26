@@ -17,16 +17,23 @@ using fun_dyn = std::function<cspace::state_t(std::vector<double>::const_iterato
                                               std::vector<double>::const_iterator, std::size_t)>;
 using fun_reached = std::function<std::pair<std::vector<double>, std::vector<float>>(const cspace::state_t&)>;
 
+struct Options {
+    using StateLimits = std::vector<std::pair<double,double>>;
+    std::size_t NumberOfPoints;
+    StateLimits limits;
+    Options(std::size_t NumberOfPoints,StateLimits limits) : NumberOfPoints(NumberOfPoints), limits(limits) {}
+};
+
 class Voronoi {
  public:
-  Voronoi(const std::size_t N, state_t x0, state_t xg);
+  Voronoi(const std::size_t N, state_t x0, state_t xg, const Options::StateLimits& limits);
   ~Voronoi();
   bool visit(state_t x);
   bool target_reached();
 
  private:
   KDTree* kdtree;
-  state_t state_limit;
+  const Options::StateLimits limits;
   std::vector<state_t> points;
   std::vector<bool> points_visited;
   state_t random_state(const std::size_t state_dim);

@@ -3,21 +3,15 @@
 
 using namespace cspace;
 
-Voronoi::Voronoi(const std::size_t N, state_t x0, state_t xg) {
+Voronoi::Voronoi(const std::size_t N, state_t x0, state_t xg, const Options::StateLimits& limits) : limits(limits){
   points.resize(N + 2);
   points[0] = x0;
-  state_limit.resize(x0.size());
 
   // Add the goal point to the points vector
   this->xg_index = 1;  // Store index for check in target_reached()
   points[xg_index] = xg;
 
   const std::size_t state_dim = x0.size();
-
-  // TODO: Insert real state Limits
-  for (std::size_t i = 0; i < state_dim; i++) {
-    state_limit[i] = 10;
-  }
 
   // Generate N random points
   for (std::size_t i = 0; i < N; i++) points[i + 2] = this->random_state(state_dim);
@@ -51,7 +45,7 @@ state_t Voronoi::random_state(const std::size_t state_dim) {
   std::random_device rd;
   std::mt19937 gen(rd());
   for (std::size_t i = 0; i < state_dim; i++) {
-    std::uniform_real_distribution<> dis(-state_limit[i], state_limit[i]);
+    std::uniform_real_distribution<> dis(limits[i].first, limits[i].second);
     randmo_vector[i] = dis(gen);
   }
   return randmo_vector;
