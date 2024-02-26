@@ -29,13 +29,18 @@ class Graph{
         std::list<Vertex> vertices;
         std::list<Edge> edges;
         std::unordered_map<std::shared_ptr<const cspace::state_t>, Vertex*> vertex_map;
-
+        bool success_flag;
 
     public:
         Graph(std::shared_ptr<const cspace::state_t> x0_ptr);
         void add_vertex(std::shared_ptr<const cspace::state_t> x);
         void add_edge(std::shared_ptr<const cspace::state_t> x1, std::shared_ptr<const cspace::state_t> x2, std::shared_ptr<const cspace::input_trajectory_t> u);
         std::list<cspace::input_t> get_input(std::shared_ptr<const cspace::state_t> x);
+
+    public:
+        bool get_success();
+        void set_success(bool flag);
+        std::size_t size_vertices();
         
 };
 

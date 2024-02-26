@@ -42,6 +42,7 @@ class ReachedSet {
   InputTrajPtrTimePair pop_input_ptr();
   state_t front();
   void clear();
+  std::size_t size();
 
  private:
   fun_dyn dynamics;

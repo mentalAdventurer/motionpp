@@ -129,6 +129,8 @@ InputTrajPtrTimePair ReachedSet::pop_input_ptr() {
 
 state_t ReachedSet::front() { return *states.front(); }
 
+std::size_t ReachedSet::size() { return states.size(); }
+
 void ReachedSet::clear() {
   states.clear();
   input_traj.clear();

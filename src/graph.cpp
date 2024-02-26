@@ -1,6 +1,6 @@
 #include "graph.h"
 
-Graph::Graph(std::shared_ptr<const cspace::state_t> x0_ptr) {
+Graph::Graph(std::shared_ptr<const cspace::state_t> x0_ptr): success_flag(false){
     add_vertex(x0_ptr);
 }
 
@@ -16,6 +16,19 @@ void Graph::add_edge(std::shared_ptr<const cspace::state_t> x1, std::shared_ptr<
     edges.emplace_back(v1, v2, u);
     v1->edges_out.push_back(&edges.back());
     v2->edge_in = &edges.back();
+}
+
+bool Graph::get_success() {
+  return success_flag;
+}
+
+void Graph::set_success(bool flag) {
+  success_flag = flag;
+}
+
+std::size_t Graph::size_vertices() {
+  return vertices.size();
+
 }
 
 std::list<cspace::input_t> Graph::get_input(std::shared_ptr<const cspace::state_t> x) {
