@@ -1,4 +1,5 @@
 #include "cell_based_search.h"
+#include <iostream>
 
 Graph cellBasedSearch(const cspace::state_t& x0, const cspace::state_t& xg, cspace::fun_dyn dynamics,
                       cspace::fun_reached motionPrimitive) {
@@ -12,9 +13,9 @@ Graph cellBasedSearch(const cspace::state_t& x0, const cspace::state_t& xg, cspa
     const auto [x_cur_ptr, cost] = Q.pop();
     R(x_cur_ptr);
     while (!R.empty()) {
-      if (P.visit(R.front())) {
-        auto x_ptr = R.pop_state_ptr();
-        auto [u_ptr, time] = R.pop_input_ptr();
+    auto x_ptr = R.pop_state_ptr();
+    auto [u_ptr, time] = R.pop_input_ptr();
+      if (P.visit(*x_ptr)) {
         Q.push(x_ptr, cost, u_ptr, time);
         G.add_vertex(x_ptr);
         G.add_edge(x_cur_ptr, x_ptr, u_ptr);
