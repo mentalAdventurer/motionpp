@@ -1,9 +1,6 @@
 #include "ElasticLinearDrive.h"
 #include <iostream>
 #include <matplot/matplot.h>
-#include "cell_based_search.h"
-
-
 
 void plotTrajectory(const std::vector<std::vector<double>> &traj,
                     const double &time) {
@@ -37,22 +34,19 @@ void plotTrajectory(const std::vector<std::vector<double>> &traj,
 
 int main() {
   using namespace matplot;
-  std::vector<double> x = {0, 0, 0, 0};
-  std::vector<double> xg = {1, 0, 0, 0};
+  std::vector<double> x = {1, 0, 0, 0};
   double time = 30;
   // auto motion_primtives = ElasticLinearDrive::getMotionPrimitives(x);
   cs::input_trajectory_t input_trajectory =
       ElasticLinearDrive::getInputTrajector(100000);
 
-  auto x_traj = ElasticLinearDrive::eulerIntegrate(x, input_trajectory, time);
-  auto G = cellBasedSearch(x, xg, ElasticLinearDrive::dynamics,
-                           ElasticLinearDrive::getMotionPrimitives);
+  auto xg = ElasticLinearDrive::eulerIntegrate(x, input_trajectory, time);
 
   // Print the trajectory
   std::cout << "Trajectory: " << xg.size() << std::endl;
 
   // Plot the trajectory
-  //plotTrajectory(xg, time);
+  plotTrajectory(xg, time);
 
   return 0;
 }

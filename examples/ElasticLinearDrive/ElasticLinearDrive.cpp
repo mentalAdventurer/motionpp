@@ -1,11 +1,15 @@
 #include "ElasticLinearDrive.h"
 #include "cspace.h"
+#include <cassert>
 
 namespace cs = cspace;
 namespace ElasticLinearDrive {
 
-cs::state_t dynamics(const cs::state_t &x, const cs::input_t &u) {
-  const size_t n = x.size();
+// create alias for std::vector<double>::const_iterator
+using vec_iter = std::vector<double>::const_iterator;
+
+std::vector<double> dynamics(vec_iter x, vec_iter u, std::size_t n) {
+  assert (n == 4); 
   const float d = 0.1;
   const float k = 1;
   const float m = 1;
@@ -30,7 +34,7 @@ cs::trajectory_t eulerIntegrate(const cs::state_t &x0,
   cs::state_t x = x0;
 
   for (std::size_t i = 0; i < time_steps; i++) {
-    cs::state_t dxdt = dynamics(x, u[i]);
+    cs::state_t dxdt = dynamics(x.begin(), u[i].begin(), x.size());
     for (std::size_t j = 0; j < x.size(); j++)
       x[j] = x[j] + dt * dxdt[j];
     x_traj[i + 1] = x;
@@ -38,11 +42,10 @@ cs::trajectory_t eulerIntegrate(const cs::state_t &x0,
   return x_traj;
 }
 
-std::vector<cs::input_trajectory_t> getMotionPrimitives(const cs::state_t &x0) {
-  std::vector<cs::input_trajectory_t> motion_primitives(2);
-  motion_primitives[0] = {{1}, {0}};
-  motion_primitives[1] = {{1}, {1}};
-  return motion_primitives;
+std::pair<std::vector<double>, std::vector<float>> getMotionPrimitives(const cs::state_t &x0) {
+  std::vector<double> motion_primitives = {1.0, 2.0, 4.0, 2.7, 1.0, 2.0, 4.0, 2.7};
+  std::vector<float> times = {0.1, 0.2};
+  return std::make_pair(motion_primitives, times);
 }
 
 cs::input_trajectory_t getInputTrajector(const std::size_t &n) {

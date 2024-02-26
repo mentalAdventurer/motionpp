@@ -6,10 +6,11 @@
 namespace cs = cspace;
 
 namespace ElasticLinearDrive {
-cs::state_t dynamics(const cs::state_t &x, const cs::input_t &u);
+using vec_iter = std::vector<double>::const_iterator;
+cs::state_t dynamics(vec_iter x, vec_iter u, const std::size_t n);
 cs::trajectory_t eulerIntegrate(const cs::state_t &x0,
                                 const cs::trajectory_t &u, const float &t);
-std::vector<cs::input_trajectory_t> getMotionPrimitives(const cs::state_t &x0);
+std::pair<std::vector<double>, std::vector<float>> getMotionPrimitives(const cs::state_t &x0);
 cs::input_trajectory_t getInputTrajector(const std::size_t &n);
 } // namespace ElasticLinearDrive
 
