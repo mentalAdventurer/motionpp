@@ -1,5 +1,9 @@
 if(BUILD_TESTING)
-    add_executable(tests test_graph.cpp test_queue.cpp test_ReachedSet.cpp)
+    add_executable(tests 
+      test_graph.cpp 
+      test_queue.cpp 
+      test_ReachedSet.cpp
+      test_voronoi.cpp)
 
     target_link_libraries(tests PUBLIC GTest::gtest_main CellBasedSearch)
 
