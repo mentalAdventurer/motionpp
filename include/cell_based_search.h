@@ -8,6 +8,6 @@
 
 
 Graph cellBasedSearch(const cspace::state_t& x0, const cspace::state_t& xg, cspace::fun_dyn dynamics,
-                      cspace::fun_reached motionPrimitive);
+                      cspace::fun_reached motionPrimitive, const cspace::Options& opt);
 
 #endif // CELL_BASED_SEARCH_H
