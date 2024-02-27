@@ -22,17 +22,19 @@ void Graph::set_success(bool flag) { success_flag = flag; }
 
 std::size_t Graph::size_vertices() { return vertices.size(); }
 
-cspace::input_trajectory_t Graph::get_input(std::shared_ptr<const cspace::state_t> x) {
+std::pair<cspace::input_trajectory_t,float> Graph::get_input(std::shared_ptr<const cspace::state_t> x) {
   cspace::input_trajectory_t path;
   Vertex* v = vertex_map.at(x);
+  float time = 0;
 
   // While not origin vertex
   while (v->edge_in != nullptr) {
     auto u_ptr = v->edge_in->input;
+    time += v->edge_in->time;
     path.insert(path.end(), u_ptr->begin(), u_ptr->end());
     v = v->edge_in->source;
   }
-  return path;
+  return {path,time};
 }
 
 auto Graph::begin() -> decltype(vertices.begin()) { return vertices.begin(); }

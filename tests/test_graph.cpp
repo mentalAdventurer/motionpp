@@ -34,11 +34,12 @@ TEST(Graph, getInput) {
   auto u_ptr = std::make_shared<cs::input_trajectory_t>(u);
   Graph G(x0_ptr);
   G.add_vertex(x1_ptr);
-  G.add_edge(x0_ptr, x1_ptr, u_ptr,1);
+  G.add_edge(x0_ptr, x1_ptr, u_ptr,1.2);
   G.add_vertex(x2_ptr);
-  G.add_edge(x1_ptr, x2_ptr, u_ptr,1);
-  auto path = G.get_input(x2_ptr);
+  G.add_edge(x1_ptr, x2_ptr, u_ptr,1.2);
+  auto [path,time] = G.get_input(x2_ptr);
   std::list<cs::input_t> expected = {{1, 1}, {0, 0}, {0,1}, {1, 0}, {1, 1}, {0, 0}, {0,1}, {1, 0}};
+  EXPECT_FLOAT_EQ(time, 2.4);
   EXPECT_EQ(path.size(), 8);
   if (!std::equal(expected.begin(), expected.end(), path.begin(), path.end())) {
     FAIL() << "Path is not as expected";
