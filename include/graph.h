@@ -1,6 +1,7 @@
 #ifndef GRAPH_H
 #define GRAPH_H
 #include "cspace.h"
+#include <cwchar>
 #include <vector>
 #include <unordered_map>
 #include <list>
@@ -19,23 +20,26 @@ namespace std {
     };
 }
 
-// Implement both in container
 class Graph{
     public:
         struct Vertex;
         struct Edge;
 
     private:
-        std::list<Vertex> vertices;
-        std::list<Edge> edges;
         std::unordered_map<std::shared_ptr<const cspace::state_t>, Vertex*> vertex_map;
         bool success_flag;
+        std::list<Vertex> vertices;
+        std::list<Edge> edges;
 
     public:
         Graph(std::shared_ptr<const cspace::state_t> x0_ptr);
         void add_vertex(std::shared_ptr<const cspace::state_t> x);
         void add_edge(std::shared_ptr<const cspace::state_t> x1, std::shared_ptr<const cspace::state_t> x2, std::shared_ptr<const cspace::input_trajectory_t> u);
-        std::list<cspace::input_t> get_input(std::shared_ptr<const cspace::state_t> x);
+        cspace::trajectory_t get_input(std::shared_ptr<const cspace::state_t> x);
+        auto begin()->decltype(vertices.begin());
+        auto end()->decltype(vertices.end());
+        auto cbegin()->decltype(vertices.cbegin());
+        auto cend()->decltype(vertices.cend());
 
     public:
         bool get_success();
