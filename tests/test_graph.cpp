@@ -13,9 +13,9 @@ TEST(Graph, addEdge) {
   Graph G(x0_ptr);
   G.add_vertex(x1_ptr);
   G.add_vertex(x2_ptr);
-  G.add_edge(x1_ptr, x2_ptr, u_ptr);
-  G.add_edge(x1_ptr, x2_ptr, u_ptr);
-  G.add_edge(x0_ptr , x2_ptr, u_ptr);
+  G.add_edge(x1_ptr, x2_ptr, u_ptr,1);
+  G.add_edge(x1_ptr, x2_ptr, u_ptr,1);
+  G.add_edge(x0_ptr , x2_ptr, u_ptr,1);
 }
 
 TEST(Graph, addVertex) {
@@ -34,9 +34,9 @@ TEST(Graph, getInput) {
   auto u_ptr = std::make_shared<cs::input_trajectory_t>(u);
   Graph G(x0_ptr);
   G.add_vertex(x1_ptr);
-  G.add_edge(x0_ptr, x1_ptr, u_ptr);
+  G.add_edge(x0_ptr, x1_ptr, u_ptr,1);
   G.add_vertex(x2_ptr);
-  G.add_edge(x1_ptr, x2_ptr, u_ptr);
+  G.add_edge(x1_ptr, x2_ptr, u_ptr,1);
   auto path = G.get_input(x2_ptr);
   std::list<cs::input_t> expected = {{1, 1}, {0, 0}, {0,1}, {1, 0}, {1, 1}, {0, 0}, {0,1}, {1, 0}};
   EXPECT_EQ(path.size(), 8);

@@ -21,7 +21,7 @@ std::pair<Graph,cspace::Voronoi> cellBasedSearch(const cspace::state_t& x0, cons
       if (P.visit(*x_ptr)) {
         Q.push(x_ptr, cost, u_ptr, time);
         G.add_vertex(x_ptr);
-        G.add_edge(x_cur_ptr, x_ptr, u_ptr);
+        G.add_edge(x_cur_ptr, x_ptr, u_ptr, time);
       }
     }
   }
