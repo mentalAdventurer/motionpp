@@ -1,9 +1,11 @@
 #include "cspace.h"
+
 #include <algorithm>
 
 using namespace cspace;
 
-Voronoi::Voronoi(const std::size_t N, state_t x0, state_t xg, const Options::StateLimits& limits) : limits(limits){
+Voronoi::Voronoi(const std::size_t N, state_t x0, state_t xg, const Options::StateLimits& limits)
+    : limits(limits) {
   points.resize(N + 2);
   points[0] = x0;
 
@@ -19,6 +21,7 @@ Voronoi::Voronoi(const std::size_t N, state_t x0, state_t xg, const Options::Sta
   // Initialize the points_visited vector
   points_visited.resize(points.size());
   std::fill(points_visited.begin(), points_visited.end(), false);
+  points_visited[0] = true;  // Mark the initial point as visited
 
   // Create the kdTree
   kdtree = new KDTree(points);
@@ -51,6 +54,8 @@ state_t Voronoi::random_state(const std::size_t state_dim) {
   return randmo_vector;
 }
 bool Voronoi::target_reached() { return points_visited[xg_index]; }
+auto Voronoi::begin() -> decltype(points.begin()) { return points.begin(); }
+auto Voronoi::end() -> decltype(points.end()) { return points.end(); }
 
 // ReachedSet
 ReachedSet::ReachedSet(fun_dyn dynamics, fun_reached motionPrimitive)
@@ -80,13 +85,13 @@ bool ReachedSet::empty() { return states.empty(); }
 std::vector<double> ReachedSet::eulerIntegrate(std::vector<double>::const_iterator x0,
                                                std::vector<double>::const_iterator u_traj,
                                                std::size_t state_dim, std::size_t traj_dim, float dt) {
-  std::vector<double> x_traj(traj_dim * state_dim);
+  std::vector<double> x_traj(traj_dim * state_dim + state_dim);
   std::copy(x0, x0 + state_dim, x_traj.begin());
 
-  for (std::size_t j = 0; j < traj_dim - 1; j++) {
+  for (std::size_t j = 0; j < traj_dim; j++) {
     auto dxdt = dynamics(x_traj.begin() + j * state_dim, u_traj + j * state_dim, state_dim);
     for (std::size_t k = 0; k < state_dim; k++) {
-      x_traj[(j + 1) * state_dim + k] = x_traj[j * state_dim + k] + dxdt[k] * dt;
+      x_traj[j * state_dim + k + state_dim] = x_traj[j * state_dim + k] + dxdt[k] * dt;
     }
   }
   return x_traj;
