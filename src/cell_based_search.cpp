@@ -2,7 +2,9 @@
 
 #include <iostream>
 
-Graph cellBasedSearch(const cspace::state_t& x0, const cspace::state_t& xg, cspace::fun_dyn dynamics,
+
+
+std::pair<Graph,cspace::Voronoi> cellBasedSearch(const cspace::state_t& x0, const cspace::state_t& xg, cspace::fun_dyn dynamics,
                       cspace::fun_reached motionPrimitive, const cspace::Options& opt) {
   namespace cs = cspace;
   cs::state_ptr x0_ptr = std::make_shared<const cs::state_t>(x0);
@@ -26,5 +28,5 @@ Graph cellBasedSearch(const cspace::state_t& x0, const cspace::state_t& xg, cspa
   if (P.target_reached()) {
     G.set_success(true);
   }
-  return G;
+  return {G,P};
 }
