@@ -37,6 +37,8 @@ std::pair<cspace::input_trajectory_t,float> Graph::get_input(std::shared_ptr<con
   return {path,time};
 }
 
+Graph::Vertex& Graph::front() { return vertices.front(); }
+Graph::Vertex& Graph::back() { return vertices.back(); }
 auto Graph::begin() -> decltype(vertices.begin()) { return vertices.begin(); }
 auto Graph::end() -> decltype(vertices.end()) { return vertices.end(); }
 auto Graph::cbegin() -> decltype(vertices.cbegin()) { return vertices.cbegin(); }
