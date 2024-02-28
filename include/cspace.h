@@ -11,7 +11,7 @@ typedef std::vector<double> input_t;
 typedef std::vector<std::vector<double>> trajectory_t;
 typedef std::vector<std::vector<double>> input_trajectory_t;
 typedef std::shared_ptr<const state_t> state_ptr;
-typedef std::shared_ptr<input_trajectory_t> input_traj_ptr;
+using input_traj_ptr = std::shared_ptr<const input_trajectory_t>;
 using InputTrajPtrTimePair = std::pair<input_traj_ptr, float>;
 using fun_dyn = std::function<cspace::state_t(std::vector<double>::const_iterator,
                                               std::vector<double>::const_iterator, std::size_t)>;
