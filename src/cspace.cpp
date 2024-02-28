@@ -24,10 +24,26 @@ Voronoi::Voronoi(const std::size_t N, state_t x0, state_t xg, const Options::Sta
   points_visited[0] = true;  // Mark the initial point as visited
 
   // Create the kdTree
-  kdtree = new KDTree(points);
+  kdtree = std::make_unique<KDTree>(points);
 }
 
-Voronoi::~Voronoi() { delete kdtree; }
+Voronoi::Voronoi(Voronoi&& other) noexcept
+    : kdtree(std::move(other.kdtree)),
+      limits(std::move(other.limits)),
+      points(std::move(other.points)),
+      points_visited(std::move(other.points_visited)),
+      xg_index(other.xg_index) {}
+
+Voronoi& Voronoi::operator=(Voronoi&& other) noexcept {
+    if (this != &other) {
+        kdtree = std::move(other.kdtree);
+        limits = other.limits;
+        points = std::move(other.points);
+        points_visited = std::move(other.points_visited);
+        xg_index = other.xg_index;
+    }
+    return *this;
+}
 
 bool Voronoi::visit(state_t x) {
   // Find the nearest neighbor to 'x' using the kdTree

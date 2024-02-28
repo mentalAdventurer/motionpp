@@ -26,8 +26,8 @@ struct Options {
 
 class Voronoi {
  private:
-  KDTree* kdtree;
-  const Options::StateLimits limits;
+  std::unique_ptr<KDTree> kdtree;
+  Options::StateLimits limits;
   std::vector<state_t> points;
   std::vector<bool> points_visited;
   state_t random_state(const std::size_t state_dim);
@@ -35,7 +35,8 @@ class Voronoi {
 
  public:
   Voronoi(const std::size_t N, state_t x0, state_t xg, const Options::StateLimits& limits);
-  ~Voronoi();
+  Voronoi(Voronoi&& other) noexcept;
+  Voronoi& operator=(Voronoi&& other) noexcept;
   bool visit(state_t x);
   bool target_reached();
   auto begin() -> decltype(points.begin());
