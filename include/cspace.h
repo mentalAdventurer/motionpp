@@ -57,7 +57,6 @@ class ReachedSet {
  private:
   fun_dyn dynamics;
   fun_reached motionPrimitive;
-  void simulate(const state_ptr& x0, std::pair<std::vector<double>, std::vector<float>>& InputTimePair);
   bool collision(std::vector<double> x, std::size_t state_dim);
   void add_reached_state(std::vector<double>::const_iterator first, std::size_t states_dim);
   void add_reached_input(std::vector<double>::const_iterator first, float time, std::size_t traj_dim,
