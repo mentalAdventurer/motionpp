@@ -70,7 +70,22 @@ std::pair<cspace::input_trajectory_t, float> Graph::get_input(std::shared_ptr<co
     path.insert(path.end(), u_ptr->begin(), u_ptr->end());
     v = v->edge_in->source;
   }
+  std::reverse(path.begin(), path.end());
   return {path, time};
+}
+
+cspace::trajectory_t Graph::get_trajectory(std::shared_ptr<const cspace::state_t> x) {
+  cspace::trajectory_t path;
+  Vertex* v = vertex_map.at(x);
+  path.emplace_back(*(v->state));
+
+  // While not origin vertex
+  while (v->edge_in != nullptr) {
+    v = v->edge_in->source;
+    path.emplace_back(*(v->state));
+  }
+  std::reverse(path.begin(), path.end());
+  return path;
 }
 
 Graph::Vertex& Graph::front() { return vertices.front(); }
