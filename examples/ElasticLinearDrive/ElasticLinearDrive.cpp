@@ -43,10 +43,10 @@ cs::trajectory_t eulerIntegrate(const cs::state_t &x0,
 }
 
 std::pair<std::vector<double>, std::vector<float>> getMotionPrimitives(const cs::state_t &x0) {
-  std::vector<float> times(4,1.0); // increase precision and range
+  std::vector<float> times(10,0.5); // increase precision and range
   std::size_t dim = 4; // const
-  std::size_t step = 10; // increase precision
-  double max_input = 3; // increase range
+  std::size_t step = 6; // increase precision
+  double max_input = 4; // increase range
 
   std::vector<double> motion_primitives(dim * step * times.size());
   double delte_input = 2 * max_input / (times.size() - 1);
