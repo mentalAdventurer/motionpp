@@ -2,6 +2,32 @@
 
 Graph::Graph(std::shared_ptr<const cspace::state_t> x0_ptr) : success_flag(false) { add_vertex(x0_ptr); }
 
+Graph::Graph(Graph& other) : success_flag(other.success_flag){
+  for (auto& v : other.vertices) {
+    add_vertex(v.state);
+  }
+  for (auto& e : other.edges) {
+    add_edge(e.source->state, e.target->state, e.input, e.time);
+  }
+}
+
+Graph& Graph::operator=(Graph& other) {
+  success_flag = other.success_flag;
+  for (auto& v : other.vertices) {
+    add_vertex(v.state);
+  }
+  for (auto& e : other.edges) {
+    add_edge(e.source->state, e.target->state, e.input, e.time);
+  }
+  return *this;
+}
+
+Graph::Graph(Graph&& other) : success_flag(other.success_flag) {
+  vertices = std::move(other.vertices);
+  edges = std::move(other.edges);
+  vertex_map = std::move(other.vertex_map);
+}
+
 void Graph::add_vertex(std::shared_ptr<const cspace::state_t> x) {
   vertices.emplace_back(x);
   vertex_map[x] = &vertices.back();
