@@ -35,6 +35,8 @@ class Voronoi {
 
  public:
   Voronoi(const std::size_t N, state_t x0, state_t xg, const Options::StateLimits& limits);
+  Voronoi(const Voronoi&) = delete;
+  Voronoi& operator=(const Voronoi&) = delete;
   Voronoi(Voronoi&& other) noexcept;
   Voronoi& operator=(Voronoi&& other) noexcept;
   bool visit(state_t x);
