@@ -7,21 +7,6 @@
 
 #include "cspace.h"
 
-// Hash function for vector<double>
-namespace std {
-template <>
-struct hash<vector<double>> {
-  size_t operator()(const vector<double>& vec) const {
-    size_t seed = vec.size();
-    for (auto& i : vec) {
-      // Combine the hash of the current element with the running hash
-      seed ^= hash<double>()(i) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-    }
-    return seed;
-  }
-};
-}  // namespace std
-
 class Graph {
  public:
   struct Vertex;
