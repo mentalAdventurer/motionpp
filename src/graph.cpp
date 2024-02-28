@@ -2,7 +2,7 @@
 
 Graph::Graph(std::shared_ptr<const cspace::state_t> x0_ptr) : success_flag(false) { add_vertex(x0_ptr); }
 
-Graph::Graph(Graph& other) : success_flag(other.success_flag){
+Graph::Graph(const Graph& other) : success_flag(other.success_flag) {
   for (auto& v : other.vertices) {
     add_vertex(v.state);
   }
@@ -11,7 +11,13 @@ Graph::Graph(Graph& other) : success_flag(other.success_flag){
   }
 }
 
-Graph& Graph::operator=(Graph& other) {
+Graph::Graph(Graph&& other)
+    : vertex_map(std::move(other.vertex_map)),
+      success_flag(other.success_flag),
+      vertices(std::move(other.vertices)),
+      edges(std::move(other.edges)) {}
+
+Graph& Graph::operator=(const Graph& other) {
   success_flag = other.success_flag;
   for (auto& v : other.vertices) {
     add_vertex(v.state);
@@ -22,10 +28,14 @@ Graph& Graph::operator=(Graph& other) {
   return *this;
 }
 
-Graph::Graph(Graph&& other) : success_flag(other.success_flag) {
-  vertices = std::move(other.vertices);
-  edges = std::move(other.edges);
-  vertex_map = std::move(other.vertex_map);
+Graph& Graph::operator=(Graph&& other) {
+  if (this != &other) {
+    vertex_map = std::move(other.vertex_map);
+    success_flag = other.success_flag;
+    vertices = std::move(other.vertices);
+    edges = std::move(other.edges);
+  }
+  return *this;
 }
 
 void Graph::add_vertex(std::shared_ptr<const cspace::state_t> x) {
@@ -48,7 +58,7 @@ void Graph::set_success(bool flag) { success_flag = flag; }
 
 std::size_t Graph::size_vertices() { return vertices.size(); }
 
-std::pair<cspace::input_trajectory_t,float> Graph::get_input(std::shared_ptr<const cspace::state_t> x) {
+std::pair<cspace::input_trajectory_t, float> Graph::get_input(std::shared_ptr<const cspace::state_t> x) {
   cspace::input_trajectory_t path;
   Vertex* v = vertex_map.at(x);
   float time = 0;
@@ -60,7 +70,7 @@ std::pair<cspace::input_trajectory_t,float> Graph::get_input(std::shared_ptr<con
     path.insert(path.end(), u_ptr->begin(), u_ptr->end());
     v = v->edge_in->source;
   }
-  return {path,time};
+  return {path, time};
 }
 
 Graph::Vertex& Graph::front() { return vertices.front(); }
