@@ -1,6 +1,7 @@
 #include "cell_based_search.h"
 
 #include <iostream>
+#include <chrono>
 
 std::pair<Graph,cspace::Voronoi> cellBasedSearch(const cspace::state_t& x0, const cspace::state_t& xg,
                                                       cspace::fun_dyn dynamics,
@@ -12,10 +13,11 @@ std::pair<Graph,cspace::Voronoi> cellBasedSearch(const cspace::state_t& x0, cons
   Queue Q(x0_ptr);
   cs::Voronoi P(opt.NumberOfPoints, x0, xg, opt.limits);
   cs::ReachedSet R(dynamics, motionPrimitive);
+  auto start = std::chrono::high_resolution_clock::now();
   while (!Q.empty() && !P.target_reached()) {
     auto [x_cur_ptr, cost] = Q.pop();
     R(x_cur_ptr);
-    while (!R.empty()) {
+    while (!R.empty() && !P.target_reached()) {
       auto x_ptr = R.pop_state_ptr();
       auto [u_ptr, time] = R.pop_input_ptr();
       if (P.visit(*x_ptr)) {
@@ -26,5 +28,9 @@ std::pair<Graph,cspace::Voronoi> cellBasedSearch(const cspace::state_t& x0, cons
     }
   }
   if (P.target_reached()) G.set_success(true);
+  auto stop = std::chrono::high_resolution_clock::now();
+  auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+  std::cout << "Time taken by function: " << duration.count() << " ms" << std::endl;
+
   return {G, std::move(P)};
 }
