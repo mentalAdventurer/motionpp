@@ -74,11 +74,13 @@ auto Voronoi::begin() -> decltype(points.begin()) { return points.begin(); }
 auto Voronoi::end() -> decltype(points.end()) { return points.end(); }
 
 // ReachedSet
-ReachedSet::ReachedSet(fun_dyn dynamics, fun_reached motionPrimitive)
-    : dynamics(dynamics), motionPrimitive(motionPrimitive) {}
+ReachedSet::ReachedSet(fun_dyn dynamics, fun_reached generateInput)
+    : dynamics(dynamics), generateInput(generateInput) {}
+
+ReachedSet::ReachedSet(fun_motion_primitive primitives) : primitives(primitives) {}
 
 void ReachedSet::operator()(const state_ptr x_ptr) {
-  auto [inputs, time] = motionPrimitive(*x_ptr);
+  auto [inputs, time] = generateInput(*x_ptr);
   auto inputs_size = inputs.size();
   auto state_dim = x_ptr->size();
   auto num_primitive = time.size();

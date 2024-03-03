@@ -16,6 +16,7 @@ using InputTrajPtrTimePair = std::pair<input_traj_ptr, float>;
 using fun_dyn = std::function<cspace::state_t(std::vector<double>::const_iterator,
                                               std::vector<double>::const_iterator, std::size_t)>;
 using fun_reached = std::function<std::pair<std::vector<double>, std::vector<float>>(const cspace::state_t&)>;
+using fun_motion_primitive = std::function<std::tuple<std::vector<double>, std::vector<double>, float>(const cspace::state_t&)>; 
 
 struct Options {
     using StateLimits = std::vector<std::pair<double,double>>;
@@ -47,7 +48,8 @@ class Voronoi {
 
 class ReachedSet {
  public:
-  ReachedSet(fun_dyn dynamics, fun_reached motionPrimitive);
+  ReachedSet(fun_dyn dynamics, fun_reached generateInput);
+  ReachedSet(fun_motion_primitive primitives);
   void operator()(const state_ptr x_ptr);
   bool empty();
   std::shared_ptr<const state_t> pop_state_ptr();
@@ -57,8 +59,9 @@ class ReachedSet {
   std::size_t size();
 
  private:
-  fun_dyn dynamics;
-  fun_reached motionPrimitive;
+  fun_dyn dynamics = nullptr;
+  fun_reached generateInput = nullptr;
+  fun_motion_primitive primitives = nullptr;
   bool collision(std::vector<double> x, std::size_t state_dim);
   void add_reached_state(std::vector<double>::const_iterator first, std::size_t states_dim);
   void add_reached_input(std::vector<double>::const_iterator first, float time, std::size_t traj_dim,

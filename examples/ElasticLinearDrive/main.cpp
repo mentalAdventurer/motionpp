@@ -32,22 +32,22 @@ void plotTrajectory(const std::vector<std::vector<double>> &traj, const double &
 
   plt::figure();
   plt::plot(t, a);
-  plt::plot(t,s);
+  plt::plot(t, s);
   plt::title("Trajectory");
   plt::figure();
   plt::plot(t, v);
-  plt::plot(t,j);
+  plt::plot(t, j);
   plt::show();
 }
 
-void plotGraph(Graph &G,cs::state_t x0,cs::state_t xg) {
+void plotGraph(Graph &G, cs::state_t x0, cs::state_t xg) {
   namespace plt = matplotlibcpp;
   std::vector<double> x, y, u, v;
 
   for ([[maybe_unused]] const auto &[state, out, in] : G) {
     if (state->size() == 4) {
-   //   std::cout << "State: " << state->at(0) << " " << state->at(2)
-   //             << " Speed: " << state->at(1) << " " << state->at(3) << std::endl;
+      //   std::cout << "State: " << state->at(0) << " " << state->at(2)
+      //             << " Speed: " << state->at(1) << " " << state->at(3) << std::endl;
       x.push_back(state->at(0));  // x position
       y.push_back(state->at(2));  // y position
       u.push_back(state->at(1));  // x component of the arrow
@@ -55,7 +55,7 @@ void plotGraph(Graph &G,cs::state_t x0,cs::state_t xg) {
     }
   }
   plt::figure();
-  plt::plot(x,y,"x");
+  plt::plot(x, y, "x");
   plt::plot({x0[0]}, {x0[2]}, "bx");
   plt::plot({xg[0]}, {xg[2]}, "gx");
   plt::figure();
@@ -76,7 +76,7 @@ void plotVoronoi(cspace::Voronoi &P) {
 
 void plotStates(const std::vector<cspace::state_t> &states) {
   namespace plt = matplotlibcpp;
-  std::vector<double> x,y,xd,yd;
+  std::vector<double> x, y, xd, yd;
   for (const auto &s : states) {
     x.push_back(s[2]);
     y.push_back(s[0]);
@@ -97,29 +97,28 @@ int main() {
 
   // Set Configuration State limits
   cs::Options opt(20000, {
-                            std::make_pair(-10, 10),
-                            std::make_pair(-10, 10),
-                            std::make_pair(-10, 10),
-                            std::make_pair(-10, 10),
-                        });
+                             std::make_pair(-10, 10),
+                             std::make_pair(-10, 10),
+                             std::make_pair(-10, 10),
+                             std::make_pair(-10, 10),
+                         });
 
-  auto [G,P] =
-      cellBasedSearch(x, xg, ElasticLinearDrive::dynamics, ElasticLinearDrive::getMotionPrimitives, opt);
+  auto [G, P] =
+      cellBasedSearch(x, xg, opt, ElasticLinearDrive::getMotionPrimitives, ElasticLinearDrive::dynamics);
 
   std::cout << "Success: " << G.get_success() << std::endl;
   std::cout << "Number of Vertices: " << G.size_vertices() << std::endl;
-  std::cout << "Initial State: " << G.front().state->at(0) << " " << G.front().state->at(1) << " " << G.front().state->at(2)
-            << " " << G.front().state->at(3) << std::endl;
-  std::cout << "Final State: " << G.back().state->at(0) << " " << G.back().state->at(1) << " " << G.back().state->at(2)
-            << " " << G.back().state->at(3) << std::endl;
+  std::cout << "Initial State: " << G.front().state->at(0) << " " << G.front().state->at(1) << " "
+            << G.front().state->at(2) << " " << G.front().state->at(3) << std::endl;
+  std::cout << "Final State: " << G.back().state->at(0) << " " << G.back().state->at(1) << " "
+            << G.back().state->at(2) << " " << G.back().state->at(3) << std::endl;
   bool plot1 = false;
   bool plot2 = false;
   bool plot3 = true;
 
-  if (plot1)
-    plotGraph(G,x,xg);
+  if (plot1) plotGraph(G, x, xg);
 
-  if (G.get_success() && plot2){
+  if (G.get_success() && plot2) {
     auto state_ptr = G.back().state;
     auto traj = G.get_trajectory(state_ptr);
     plotStates(traj);
@@ -127,7 +126,7 @@ int main() {
 
   if (G.get_success() && plot3) {
     auto state_ptr = G.back().state;
-    auto [input_traj,time] = G.get_input(state_ptr);
+    auto [input_traj, time] = G.get_input(state_ptr);
     auto traj = ElasticLinearDrive::eulerIntegrate(*state_ptr, input_traj, time);
     plotTrajectory(traj, time);
   }
