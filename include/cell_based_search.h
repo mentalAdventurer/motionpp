@@ -9,8 +9,8 @@
 
 std::pair<Graph, cspace::Voronoi> cellBasedSearch(const cspace::state_t& x0, const cspace::state_t& xg,
                                                   const cspace::Options& opt,
-                                                  cspace::fun_reached reached,
-                                                  cspace::fun_dyn dynamics = nullptr); 
+                                                  cspace::fun_inputs generateInput,
+                                                  cspace::fun_simulator simulator); 
 
 
 #endif  // CELL_BASED_SEARCH_H

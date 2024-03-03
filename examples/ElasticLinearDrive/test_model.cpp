@@ -40,7 +40,7 @@ int main() {
   cs::input_trajectory_t input_trajectory =
       ElasticLinearDrive::getInputTrajector(100000);
 
-  auto xg = ElasticLinearDrive::eulerIntegrate(x, input_trajectory, time);
+  auto xg = ElasticLinearDrive::eulerIntegrate_state(x, input_trajectory, time);
 
   // Print the trajectory
   std::cout << "Trajectory: " << xg.size() << std::endl;

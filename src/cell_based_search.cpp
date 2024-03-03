@@ -38,11 +38,11 @@ std::pair<Graph, cspace::Voronoi> cellBasedSearch(const cspace::state_t& x0, con
 
 std::pair<Graph, cspace::Voronoi> cellBasedSearch(const cspace::state_t& x0, const cspace::state_t& xg,
                                                   const cspace::Options& opt,
-                                                  cspace::fun_reached generateInput,
-                                                  cspace::fun_dyn dynamics) {
+                                                  cspace::fun_inputs generateInput,
+                                                  cspace::fun_simulator simulator) {
   namespace cs = cspace;
   cs::Voronoi P(opt.NumberOfPoints, x0, xg, opt.limits);
-  cs::ReachedSet R(dynamics, generateInput);
+  cs::ReachedSet R(simulator, generateInput);
   return cellBasedSearch(x0, xg, opt, R, P);
 }
 

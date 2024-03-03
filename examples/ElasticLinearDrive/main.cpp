@@ -104,7 +104,7 @@ int main() {
                          });
 
   auto [G, P] =
-      cellBasedSearch(x, xg, opt, ElasticLinearDrive::getMotionPrimitives, ElasticLinearDrive::dynamics);
+      cellBasedSearch(x, xg, opt, ElasticLinearDrive::getMotionPrimitives, ElasticLinearDrive::eulerIntegrate);
 
   std::cout << "Success: " << G.get_success() << std::endl;
   std::cout << "Number of Vertices: " << G.size_vertices() << std::endl;
@@ -127,7 +127,7 @@ int main() {
   if (G.get_success() && plot3) {
     auto state_ptr = G.back().state;
     auto [input_traj, time] = G.get_input(state_ptr);
-    auto traj = ElasticLinearDrive::eulerIntegrate(*state_ptr, input_traj, time);
+    auto traj = ElasticLinearDrive::eulerIntegrate_state(*state_ptr, input_traj, time);
     plotTrajectory(traj, time);
   }
   plt::show();

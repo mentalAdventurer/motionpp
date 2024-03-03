@@ -13,9 +13,9 @@ typedef std::vector<std::vector<double>> input_trajectory_t;
 typedef std::shared_ptr<const state_t> state_ptr;
 using input_traj_ptr = std::shared_ptr<const input_trajectory_t>;
 using InputTrajPtrTimePair = std::pair<input_traj_ptr, float>;
-using fun_dyn = std::function<cspace::state_t(std::vector<double>::const_iterator,
-                                              std::vector<double>::const_iterator, std::size_t)>;
-using fun_reached = std::function<std::pair<std::vector<double>, std::vector<float>>(const cspace::state_t&)>;
+using fun_simulator = std::function<std::vector<double>(std::vector<double>::const_iterator,
+                                                        std::vector<double>::const_iterator, std::size_t, std::size_t, float)>;
+using fun_inputs = std::function<std::pair<std::vector<double>, std::vector<float>>(const cspace::state_t&)>;
 using fun_motion_primitive = std::function<std::tuple<std::vector<double>, std::vector<double>, float>(const cspace::state_t&)>; 
 
 struct Options {
@@ -48,7 +48,7 @@ class Voronoi {
 
 class ReachedSet {
  public:
-  ReachedSet(fun_dyn dynamics, fun_reached generateInput);
+  ReachedSet(fun_simulator simulator, fun_inputs generateInput);
   ReachedSet(fun_motion_primitive primitives);
   void operator()(const state_ptr x_ptr);
   bool empty();
@@ -59,8 +59,8 @@ class ReachedSet {
   std::size_t size();
 
  private:
-  fun_dyn dynamics = nullptr;
-  fun_reached generateInput = nullptr;
+  fun_simulator simulator = nullptr;
+  fun_inputs generateInput = nullptr;
   fun_motion_primitive primitives = nullptr;
   bool collision(std::vector<double> x, std::size_t state_dim);
   void add_reached_state(std::vector<double>::const_iterator first, std::size_t states_dim);

@@ -67,7 +67,7 @@ std::pair<cspace::input_trajectory_t, float> Graph::get_input(std::shared_ptr<co
   while (v->edge_in != nullptr) {
     auto u_ptr = v->edge_in->input;
     time += v->edge_in->time;
-    path.insert(path.end(), u_ptr->begin(), u_ptr->end());
+    path.insert(path.end(), u_ptr->rbegin(), u_ptr->rend());
     v = v->edge_in->source;
   }
   std::reverse(path.begin(), path.end());

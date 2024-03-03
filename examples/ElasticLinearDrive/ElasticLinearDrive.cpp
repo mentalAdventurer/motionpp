@@ -23,7 +23,7 @@ std::vector<double> dynamics(vec_iter x, vec_iter u, std::size_t n) {
   return dxdt;
 }
 
-cs::trajectory_t eulerIntegrate(const cs::state_t &x0,
+cs::trajectory_t eulerIntegrate_state(const cs::state_t &x0,
                                 const cs::input_trajectory_t &u,
                                 const float &t) {
   const std::size_t time_steps = u.size();
@@ -38,6 +38,21 @@ cs::trajectory_t eulerIntegrate(const cs::state_t &x0,
     for (std::size_t j = 0; j < x.size(); j++)
       x[j] = x[j] + dt * dxdt[j];
     x_traj[i + 1] = x;
+  }
+  return x_traj;
+}
+
+std::vector<double> eulerIntegrate(std::vector<double>::const_iterator x0,
+                                               std::vector<double>::const_iterator u_traj,
+                                               std::size_t state_dim, std::size_t traj_dim, float dt) {
+  std::vector<double> x_traj(traj_dim * state_dim + state_dim);
+  std::copy(x0, x0 + state_dim, x_traj.begin());
+
+  for (std::size_t j = 0; j < traj_dim; j++) {
+    auto dxdt = dynamics(x_traj.begin() + j * state_dim, u_traj + j * state_dim, state_dim);
+    for (std::size_t k = 0; k < state_dim; k++) {
+      x_traj[j * state_dim + k + state_dim] = x_traj[j * state_dim + k] + dxdt[k] * dt;
+    }
   }
   return x_traj;
 }

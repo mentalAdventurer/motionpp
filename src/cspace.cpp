@@ -74,8 +74,8 @@ auto Voronoi::begin() -> decltype(points.begin()) { return points.begin(); }
 auto Voronoi::end() -> decltype(points.end()) { return points.end(); }
 
 // ReachedSet
-ReachedSet::ReachedSet(fun_dyn dynamics, fun_reached generateInput)
-    : dynamics(dynamics), generateInput(generateInput) {}
+ReachedSet::ReachedSet(fun_simulator simulator, fun_inputs generateInput)
+    : simulator(simulator), generateInput(generateInput) {}
 
 ReachedSet::ReachedSet(fun_motion_primitive primitives) : primitives(primitives) {}
 
@@ -85,10 +85,11 @@ void ReachedSet::operator()(const state_ptr x_ptr) {
   auto state_dim = x_ptr->size();
   auto num_primitive = time.size();
   auto traj_size = inputs_size / num_primitive / state_dim;
+
   // Motion Primitive Loop
   for (std::size_t i = 0; i < num_primitive; i++) {
     const auto dt = time[i] / traj_size;
-    std::vector<double> x_traj = eulerIntegrate(x_ptr->begin(), inputs.begin() + i * (state_dim * traj_size),
+    std::vector<double> x_traj = simulator(x_ptr->begin(), inputs.begin() + i * (state_dim * traj_size),
                                                 state_dim, traj_size, dt);
     // Add if the state is not in collision
     if (!collision(x_traj, state_dim)) {
@@ -99,21 +100,6 @@ void ReachedSet::operator()(const state_ptr x_ptr) {
 }
 
 bool ReachedSet::empty() { return states.empty(); }
-
-std::vector<double> ReachedSet::eulerIntegrate(std::vector<double>::const_iterator x0,
-                                               std::vector<double>::const_iterator u_traj,
-                                               std::size_t state_dim, std::size_t traj_dim, float dt) {
-  std::vector<double> x_traj(traj_dim * state_dim + state_dim);
-  std::copy(x0, x0 + state_dim, x_traj.begin());
-
-  for (std::size_t j = 0; j < traj_dim; j++) {
-    auto dxdt = dynamics(x_traj.begin() + j * state_dim, u_traj + j * state_dim, state_dim);
-    for (std::size_t k = 0; k < state_dim; k++) {
-      x_traj[j * state_dim + k + state_dim] = x_traj[j * state_dim + k] + dxdt[k] * dt;
-    }
-  }
-  return x_traj;
-}
 bool ReachedSet::collision(std::vector<double> x, std::size_t state_dim) { return false; }
 
 void ReachedSet::add_reached_state(std::vector<double>::const_iterator first, std::size_t states_dim) {
