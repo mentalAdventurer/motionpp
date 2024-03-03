@@ -16,7 +16,7 @@ using InputTrajPtrTimePair = std::pair<input_traj_ptr, float>;
 using fun_simulator = std::function<std::vector<double>(std::vector<double>::const_iterator,
                                                         std::vector<double>::const_iterator, std::size_t, std::size_t, float)>;
 using fun_inputs = std::function<std::pair<std::vector<double>, std::vector<float>>(const cspace::state_t&)>;
-using fun_motion_primitive = std::function<std::tuple<std::vector<double>, std::vector<double>, float>(const cspace::state_t&)>; 
+using fun_motion_primitive = std::function<std::tuple<std::vector<double>, std::vector<double>, std::vector<float>>(const cspace::state_t&)>; 
 
 struct Options {
     using StateLimits = std::vector<std::pair<double,double>>;
@@ -51,18 +51,20 @@ class ReachedSet {
   ReachedSet(fun_simulator simulator, fun_inputs generateInput);
   ReachedSet(fun_motion_primitive primitives);
   void operator()(const state_ptr x_ptr);
-  bool empty();
+  void init_reacheable_points_simulator(const state_ptr x_ptr);
+  void init_reacheable_points_primitives(const state_ptr x_ptr);
   std::shared_ptr<const state_t> pop_state_ptr();
   InputTrajPtrTimePair pop_input_ptr();
   state_t front();
   void clear();
+  bool empty();
   std::size_t size();
 
  private:
   fun_simulator simulator = nullptr;
   fun_inputs generateInput = nullptr;
   fun_motion_primitive primitives = nullptr;
-  bool collision(std::vector<double> x, std::size_t state_dim);
+  bool collision(std::vector<double>::iterator,std::vector<double>::iterator,std::size_t);
   void add_reached_state(std::vector<double>::const_iterator first, std::size_t states_dim);
   void add_reached_input(std::vector<double>::const_iterator first, float time, std::size_t traj_dim,
                          std::size_t states_dim);

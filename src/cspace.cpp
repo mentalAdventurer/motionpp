@@ -35,14 +35,14 @@ Voronoi::Voronoi(Voronoi&& other) noexcept
       xg_index(other.xg_index) {}
 
 Voronoi& Voronoi::operator=(Voronoi&& other) noexcept {
-    if (this != &other) {
-        kdtree = std::move(other.kdtree);
-        limits = other.limits;
-        points = std::move(other.points);
-        points_visited = std::move(other.points_visited);
-        xg_index = other.xg_index;
-    }
-    return *this;
+  if (this != &other) {
+    kdtree = std::move(other.kdtree);
+    limits = other.limits;
+    points = std::move(other.points);
+    points_visited = std::move(other.points_visited);
+    xg_index = other.xg_index;
+  }
+  return *this;
 }
 
 bool Voronoi::visit(state_t x) {
@@ -80,27 +80,55 @@ ReachedSet::ReachedSet(fun_simulator simulator, fun_inputs generateInput)
 ReachedSet::ReachedSet(fun_motion_primitive primitives) : primitives(primitives) {}
 
 void ReachedSet::operator()(const state_ptr x_ptr) {
+  // Depeding on which constructor was used, call the appropriate initialization function
+  if (primitives != nullptr) {
+    init_reacheable_points_primitives(x_ptr);
+  } else {
+    init_reacheable_points_simulator(x_ptr);
+  }
+}
+
+void ReachedSet::init_reacheable_points_simulator(const state_ptr x_ptr) {
   auto [inputs, time] = generateInput(*x_ptr);
-  auto inputs_size = inputs.size();
-  auto state_dim = x_ptr->size();
-  auto num_primitive = time.size();
-  auto traj_size = inputs_size / num_primitive / state_dim;
+  const std::size_t inputs_size = inputs.size();
+  const std::size_t state_dim = x_ptr->size();
+  const std::size_t num_primitive = time.size();
+  const std::size_t traj_size = inputs_size / num_primitive / state_dim;
 
   // Motion Primitive Loop
   for (std::size_t i = 0; i < num_primitive; i++) {
     const auto dt = time[i] / traj_size;
-    std::vector<double> x_traj = simulator(x_ptr->begin(), inputs.begin() + i * (state_dim * traj_size),
-                                                state_dim, traj_size, dt);
+    std::vector<double> x_traj =
+        simulator(x_ptr->begin(), inputs.begin() + i * (state_dim * traj_size), state_dim, traj_size, dt);
     // Add if the state is not in collision
-    if (!collision(x_traj, state_dim)) {
+    if (!collision(x_traj.begin(), x_traj.end(), state_dim)) {
       add_reached_state(x_traj.end() - state_dim, state_dim);
       add_reached_input(inputs.begin() + i * (state_dim * traj_size), time[i], traj_size, state_dim);
     }
   }
 }
 
+void ReachedSet::init_reacheable_points_primitives(const state_ptr x_ptr) {
+  auto [trajs, inputs, time] = primitives(*x_ptr);
+  const std::size_t state_dim = x_ptr->size();
+  const std::size_t num_primitive = time.size();
+  const std::size_t traj_size = inputs.size() / num_primitive / state_dim;
+
+  for (std::size_t i = 0; i < num_primitive; i++) {
+    auto traj_start = trajs.begin() + i * (state_dim * traj_size);
+    auto traj_end = trajs.begin() + (i + 1) * (state_dim * traj_size);
+
+    if(!collision(traj_start, traj_end, state_dim)) {
+      add_reached_state(trajs.end() - state_dim, state_dim);
+      add_reached_input(inputs.begin() + i * (state_dim * traj_size), time[i], traj_size, state_dim);
+    }
+  }
+}
+
 bool ReachedSet::empty() { return states.empty(); }
-bool ReachedSet::collision(std::vector<double> x, std::size_t state_dim) { return false; }
+bool ReachedSet::collision(std::vector<double>::iterator, std::vector<double>::iterator, std::size_t) {
+  return false;
+}
 
 void ReachedSet::add_reached_state(std::vector<double>::const_iterator first, std::size_t states_dim) {
   state_ptr x_ptr(new state_t(first, first + states_dim));
