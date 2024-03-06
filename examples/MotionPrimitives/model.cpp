@@ -29,14 +29,24 @@ vec_double calculate_input(vec_double x0, cvec_double accel, double dt){
 }
 
 vec_double simulate_system(vec_double x, cvec_double& inputs, double dt){
-  vec_double trajc(x.size()*(inputs.size()+1),0);
-  std::copy(x.begin(),x.end(),trajc.begin());
+  vec_double trajc(x.size()*inputs.size(),0);
   for (std::size_t i = 0; i < inputs.size(); i++){
     auto dxdt = dynamics(x,inputs[i]);
     for (std::size_t j = 0; j < x.size(); j++){
       x[j] += dxdt[j] * dt;
-      trajc[(i+1)*x.size() + j] = x[j];
+      trajc[i*x.size() + j] = x[j];
     }
   }
   return trajc;
+}
+
+trajTuple get_zv_trajectory(double start_position, double start_speed, double target_speed) {
+  auto [times, speed, accel, jerk] =
+      generate_scurve(start_speed, target_speed, param::accel_limit, param::jerk_limit, param::dt);
+  auto impulses = generate_impulse_from_signal(jerk);
+  auto [impulse, time] = apply_zero_vibration_shaping(impulses, times, param::kappa, param::Tv);
+  auto [zv_v, zv_a, zv_j] = generate_traj_from_impulses(impulse, time);
+  auto inputs = calculate_input({0, 0, start_position, start_speed}, zv_a, param::dt);
+  auto traj = simulate_system({0, 0, start_position, start_speed}, inputs, param::dt);
+  return std::make_tuple(time, traj, inputs);
 }

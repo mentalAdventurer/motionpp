@@ -12,9 +12,9 @@ static const double wd = std::sqrt(w0_sq - delta*delta), fd = wd / (2 * M_PI), T
 static const double kappa = std::exp(-Tv * delta); 
 }  // namespace param
    
-   
-
+using trajTuple = std::tuple<std::vector<double>, std::vector<double>, std::vector<double>>;   
 vec_double dynamics(cvec_double& x,double u);
 vec_double calculate_input(vec_double x0, cvec_double accel, double dt);
 vec_double simulate_system(vec_double x, cvec_double& inputs, double dt);
+trajTuple get_zv_trajectory(double start_position, double start_speed, double target_speed);
 #endif  // MODEL_H
