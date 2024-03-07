@@ -123,9 +123,21 @@ bool ReachedSet::collision(std::vector<double>::iterator, std::vector<double>::i
   return false;
 }
 
+void ReachedSet::add_reached_state(std::vector<double>::const_iterator first, std::vector<double>::const_iterator last) {
+  state_ptr x_ptr(new state_t(first, last));
+  states.push_back(x_ptr);
+}
+
 void ReachedSet::add_reached_state(std::vector<double>::const_iterator first, std::size_t states_dim) {
   state_ptr x_ptr(new state_t(first, first + states_dim));
   states.push_back(x_ptr);
+}
+
+void ReachedSet::add_reached_input(std::vector<double>::const_iterator first,std::vector<double>::const_iterator last, float time,std::size_t input_dim) {
+  input_traj_ptr input_ptr(
+      new input_trajectory_t(convertTo2D(first, last, input_dim)));
+  times.push_back(time);
+  input_traj.push_back(std::move(input_ptr));
 }
 
 void ReachedSet::add_reached_input(std::vector<double>::const_iterator first, float time,

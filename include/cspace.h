@@ -67,8 +67,10 @@ class ReachedSet {
   fun_motion_primitive primitives = nullptr;
   bool collision(std::vector<double>::iterator,std::vector<double>::iterator,std::size_t);
   void add_reached_state(std::vector<double>::const_iterator first, std::size_t states_dim);
+  void add_reached_state(std::vector<double>::const_iterator first, std::vector<double>::const_iterator last);
   void add_reached_input(std::vector<double>::const_iterator first, float time, std::size_t traj_dim,
                          std::size_t states_dim);
+  void add_reached_input(std::vector<double>::const_iterator first,std::vector<double>::const_iterator last, float time,std::size_t input_dim);
   std::vector<std::vector<double>> convertTo2D(std::vector<double>::const_iterator first,
                                                std::vector<double>::const_iterator last,
                                                std::size_t state_dim);
