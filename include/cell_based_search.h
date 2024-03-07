@@ -9,8 +9,15 @@
 
 std::pair<Graph, cspace::Voronoi> cellBasedSearch(const cspace::state_t& x0, const cspace::state_t& xg,
                                                   const cspace::Options& opt,
+                                                  cspace::ReachedSet& R, cspace::Voronoi& P);
+
+std::pair<Graph, cspace::Voronoi> cellBasedSearch(const cspace::state_t& x0, const cspace::state_t& xg,
+                                                  const cspace::Options& opt,
                                                   cspace::fun_inputs generateInput,
                                                   cspace::fun_simulator simulator); 
 
+std::pair<Graph, cspace::Voronoi> cellBasedSearch(const cspace::state_t& x0, const cspace::state_t& xg,
+                                                  const cspace::Options& opt,
+                                                  cspace::fun_motion_primitive primitives);
 
 #endif  // CELL_BASED_SEARCH_H
