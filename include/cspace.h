@@ -13,10 +13,11 @@ typedef std::vector<std::vector<double>> input_trajectory_t;
 typedef std::shared_ptr<const state_t> state_ptr;
 using input_traj_ptr = std::shared_ptr<const input_trajectory_t>;
 using InputTrajPtrTimePair = std::pair<input_traj_ptr, float>;
+using trajTuple = std::tuple<std::vector<double>, std::vector<double>, std::vector<double>>; 
 using fun_simulator = std::function<std::vector<double>(std::vector<double>::const_iterator,
                                                         std::vector<double>::const_iterator, std::size_t, std::size_t, float)>;
 using fun_inputs = std::function<std::pair<std::vector<double>, std::vector<float>>(const cspace::state_t&)>;
-using fun_motion_primitive = std::function<std::tuple<std::vector<double>, std::vector<double>, std::vector<float>>(const cspace::state_t&)>; 
+using fun_motion_primitive = std::function<std::vector<trajTuple>(const state_t&)>; 
 
 struct Options {
     using StateLimits = std::vector<std::pair<double,double>>;

@@ -107,20 +107,13 @@ void ReachedSet::init_reacheable_points_simulator(const state_ptr x_ptr) {
     }
   }
 }
-
 void ReachedSet::init_reacheable_points_primitives(const state_ptr x_ptr) {
-  auto [trajs, inputs, time] = primitives(*x_ptr);
-  const std::size_t state_dim = x_ptr->size();
-  const std::size_t num_primitive = time.size();
-  const std::size_t traj_size = inputs.size() / num_primitive / state_dim;
+  auto primitives_for_x0 = primitives(*x_ptr);
 
-  for (std::size_t i = 0; i < num_primitive; i++) {
-    auto traj_start = trajs.begin() + i * (state_dim * traj_size);
-    auto traj_end = trajs.begin() + (i + 1) * (state_dim * traj_size);
-
-    if(!collision(traj_start, traj_end, state_dim)) {
-      add_reached_state(trajs.end() - state_dim, state_dim);
-      add_reached_input(inputs.begin() + i * (state_dim * traj_size), time[i], traj_size, state_dim);
+  for(auto& [time, states, input] : primitives_for_x0){
+    if (!collision(states.begin(), states.end(), x_ptr->size())) {
+      add_reached_state(states.end() - x_ptr->size(), x_ptr->size());
+      add_reached_input(input.begin(), input.end(), time.back(), input.size() / time.size());
     }
   }
 }
