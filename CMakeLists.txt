@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.10)
 project(MotionPlanningLibrary)
 
+# Options
+option(MOTIONPP_BUILD_EXAMPLES "Build MotionPP examples" OFF)
+option(MOTIONPP_BUILD_TESTS "Build MotionPP tests" OFF)
+
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 17)
 
@@ -19,8 +23,14 @@ include(CTest)
 
 # Add subdirectories
 add_subdirectory(external)
-add_subdirectory(tests)
-add_subdirectory(examples)
+
+if (MOTIONPP_BUILD_TESTS)
+    add_subdirectory(tests)
+endif()
+
+if (MOTIONPP_BUILD_EXAMPLES)
+    add_subdirectory(examples)
+endif()
 
 # Create Dynamic Library 
 add_library(CellBasedSearch SHARED 
