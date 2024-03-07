@@ -1,14 +1,12 @@
 #include <matplot/freestanding/plot.h>
 #include <matplot/matplot.h>
-#include <matplotlibcpp.h>
-
 #include <iostream>
 
 #include "ElasticLinearDrive.h"
 #include "cell_based_search.h"
 
 void plotTrajectory(const std::vector<std::vector<double>> &traj, const double &time) {
-  namespace plt = matplotlibcpp;
+  namespace plt = matplot;
   // Calculate Time
   const double steps = traj.size();
   const double dt = time / steps;
@@ -41,7 +39,7 @@ void plotTrajectory(const std::vector<std::vector<double>> &traj, const double &
 }
 
 void plotGraph(Graph &G, cs::state_t x0, cs::state_t xg) {
-  namespace plt = matplotlibcpp;
+  namespace plt = matplot;
   std::vector<double> x, y, u, v;
 
   for ([[maybe_unused]] const auto &[state, out, in] : G) {
@@ -63,7 +61,7 @@ void plotGraph(Graph &G, cs::state_t x0, cs::state_t xg) {
 }
 
 void plotVoronoi(cspace::Voronoi &P) {
-  namespace plt = matplotlibcpp;
+  namespace plt = matplot;
   std::vector<double> x, y, xd, yd;
   for (const auto &p : P) {
     x.push_back(p[0]);
@@ -75,7 +73,7 @@ void plotVoronoi(cspace::Voronoi &P) {
 }
 
 void plotStates(const std::vector<cspace::state_t> &states) {
-  namespace plt = matplotlibcpp;
+  namespace plt = matplot;
   std::vector<double> x, y, xd, yd;
   for (const auto &s : states) {
     x.push_back(s[2]);
@@ -91,7 +89,7 @@ void plotStates(const std::vector<cspace::state_t> &states) {
 }
 
 int main() {
-  namespace plt = matplotlibcpp;
+  namespace plt = matplot;
   std::vector<double> x = {0, 0, 0, 0};
   std::vector<double> xg = {0, 0, 4, 0};
 
