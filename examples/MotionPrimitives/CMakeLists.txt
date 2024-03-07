@@ -3,8 +3,6 @@ project(MotionPrimitive)
 
 set(CMAKE_CXX_STANDARD 20)
 
-find_package(Matplot++ REQUIRED)
-
 add_executable(MotionPrimitive main.cpp inputShaping.cpp model.cpp)
-target_link_libraries(MotionPrimitive CellBasedSearch Matplot++::matplot)
+target_link_libraries(MotionPrimitive PUBLIC CellBasedSearch matplot)
 
