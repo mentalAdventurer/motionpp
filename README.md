@@ -1,5 +1,8 @@
 # Motion++
 
+Motion++ is a simple implementation of a sampling-based algorithm. 
+It finds near optimal solutions by decomposing the state space into cells.
+
 ### Installation
 
 #### Build from source
@@ -16,4 +19,5 @@ If you want to build the examples and tests use the follwing flags:
 ```bash
 cmake -S . build -DMOTIONPP_BUILD_TESTS=ON -DMOTIONPP_BUILD_EXAMPLES=ON
 ```
-Running the examples requires `gnuplot` as a dependency.
+> [!WARNING]  
+> Running the examples requires `gnuplot` as a runtime dependency.
