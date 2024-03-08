@@ -55,14 +55,18 @@ void plot_primitives(std::vector<trajTuple>& primitives) {
   h->position({0, 0, 600, 600});
   plt::tiledlayout(3, 1);
   auto ax0 = plt::nexttile();
+  plt::title(ax0, "z");
   plt::hold(ax0, true);
   plt::grid(ax0,true);
   auto ax1 = plt::nexttile();
+  plt::title(ax1, "z_p");
   plt::hold(ax1, true);
   plt::grid(ax1,true);
   auto ax2 = plt::nexttile();
+  plt::title(ax2, "Input");
   plt::hold(ax2, true);
   plt::grid(ax2,true);
+  plt::xlabel(ax2, "Time (s)");
 
   for (const auto& [time, states, input] : primitives) {
     std::vector<double> x, xd, z, zd;
@@ -93,11 +97,14 @@ void plot_graph(Graph& G, cspace::state_t x0, cspace::state_t xg) {
     }
   }
   plt::figure();
-  plt::plot(z, zp, "x");
+  plt::plot(z, zp, ".")->marker_size(5);
   plt::hold(true);
-  plt::plot({x0[2]}, {x0[3]}, "bx");
-  plt::plot({xg[2]}, {xg[3]}, "gx");
+  plt::plot({x0[2]}, {x0[3]}, "bx")->marker_size(15);
+  plt::plot({xg[2]}, {xg[3]}, "gx")->marker_size(15);
+  plt::legend({"States", "Start", "Goal"});
   plt::grid(true);
+  plt::xlabel("z");
+  plt::ylabel("z_p");
   plt::show();
 }
 
@@ -118,7 +125,11 @@ void plot_trajectory(const std::vector<std::vector<double>> &traj) {
   }
 
   plt::figure();
-  plt::plot(z, zp);
+  plt::plot(z, zp)->line_width(2);
+  plt::hold(true);
+  plt::plot(z, zp,".")->marker_size(5);
+  plt::xlabel("z");
+  plt::ylabel("z_p");
   plt::title("Trajectory");
   plt::show();
 }
@@ -208,7 +219,7 @@ std::vector<trajTuple> MotionPrimitive::operator()(const cspace::state_t x) {
 int main() {
   MotionPrimitive primitives;
 
-  cspace::state_t x0 = {0, 0, -1, 0};
+  cspace::state_t x0 = {0, 0, 0, 0};
   cspace::state_t xg = {0, 0, 1, 0.0};
 
   cspace::Options opt(1000, {
@@ -219,10 +230,11 @@ int main() {
                            });
 
 
-  cspace::state_t x_test = {0, 0, 0.04, 0.5};
-  auto primitives_x0 = primitives(x0);
-  primitives_x0 = primitives(x_test);
+  cspace::state_t x_test = {0, 0, 0.1, 0.2};
+  auto primitives_x0 = primitives(x_test);
   std::cout << "Number of primitives: " << primitives_x0.size() << std::endl;
+  plot_states_and_input(std::get<0>(primitives_x0[1]), std::get<1>(primitives_x0[1]), std::get<2>(primitives_x0[1]));
+  plot_primitives(primitives_x0);
 
   // Results
   auto [G, P] = cellBasedSearch(x0, xg, opt, primitives);
