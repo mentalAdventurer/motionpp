@@ -1,29 +1,19 @@
-# motionplanning
+# Motion++
 
-## Progress
-- [x] Model
-    - [x] Design Reduced Model
-        - [ ] Tested
-    - [ ] Benchmark Model ElasticLinearDrive
-        - [x] Tested
-- [x] Integrator
-    - [ ] Tested
-- [x] Voronoi (Dirichlet-Zerlegung des Konfigurationsraumes)
-    - [x] KDTree
-        - [x] Tested
-    - [ ] Directed discretisation  
-        - [ ] Tested
-- [x] Graph
-    - [x] Hash function
-    - [x] Tested
-- [x] Queue
-    - [x] Kosten Funktion
-        - [x] Tested
-    - [x] Sortier Algorithmus
-        - [x] Tested
-    - [ ] Option Metric Überladen Konstruktor
-- [ ] Collision Detection (impl. Voronoi | ReachedSet)
-    - [ ] Minkoski Sum
-- [ ] ReachedSet
-    - ? Diskretisierung des Inputs
+### Installation
 
+#### Build from source
+
+```bash
+git clone --recursive https://git.uibk.ac.at/csba1368/motionplanning.git 
+cd motionplanning
+cmake -S . -B build
+cmake --build build
+```
+
+If you want to build the examples and tests use the follwing flags:
+
+```bash
+cmake -S . build -DMOTIONPP_BUILD_TESTS=ON -DMOTIONPP_BUILD_EXAMPLES=ON
+```
+Running the exmaples requires `gnuplot` as a dependency.
