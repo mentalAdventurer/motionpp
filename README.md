@@ -16,4 +16,4 @@ If you want to build the examples and tests use the follwing flags:
 ```bash
 cmake -S . build -DMOTIONPP_BUILD_TESTS=ON -DMOTIONPP_BUILD_EXAMPLES=ON
 ```
-Running the exmaples requires `gnuplot` as a dependency.
+Running the examples requires `gnuplot` as a dependency.
