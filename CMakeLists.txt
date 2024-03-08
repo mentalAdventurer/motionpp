@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(MotionPlanningLibrary)
+project(Motionpp)
 
 # Options
 option(MOTIONPP_BUILD_EXAMPLES "Build MotionPP examples" OFF)
@@ -33,13 +33,13 @@ if (MOTIONPP_BUILD_EXAMPLES)
 endif()
 
 # Create Dynamic Library 
-add_library(CellBasedSearch SHARED 
+add_library(${PROJECT_NAME} STATIC 
     src/cell_based_search.cpp
     src/cspace.cpp 
     src/queue.cpp
     src/graph.cpp) 
 
 # Linking Libraries
-target_include_directories(CellBasedSearch PUBLIC include)
+target_include_directories(${PROJECT_NAME} PUBLIC include)
 #target_link_directories(simulator PUBLIC)
-target_link_libraries(CellBasedSearch PUBLIC KDTree) 
+target_link_libraries(${PROJECT_NAME} PUBLIC KDTree) 
