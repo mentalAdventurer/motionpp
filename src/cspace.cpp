@@ -241,23 +241,22 @@ bool ReachedSet::collision(std::vector<double>::iterator begin, std::vector<doub
     return false;
   }
 
-  for (auto& dynamicObstacle : opt.dynamic_obstacles) {
-    // Transform the dynamic obstacle's polytope data based on the current state
-    dynamicObstacle.polytope_data = dynamicObstacle.transform_obstacle(
-        dynamicObstacle.polytope_data, dynamicObstacle.x_cur, std::vector<double>(begin, begin + state_dim));
+  for (; begin < end; begin += state_dim) {
+    for (auto& dynamicObstacle : opt.dynamic_obstacles) {
+      // Transform the dynamic obstacle's polytope data based on the current state
+      dynamicObstacle.polytope_data =
+          dynamicObstacle.transform_obstacle(dynamicObstacle.polytope_data, dynamicObstacle.x_cur,
+                                             std::vector<double>(begin, begin + state_dim));
 
-    for (auto& staticObstacle : opt.static_obstacles) {
-      gkSimplex simplex;
-      simplex.nvrtx = 0;
-      auto distance = compute_minimum_distance(dynamicObstacle.polytope, staticObstacle.polytope, &simplex);
+      for (auto& staticObstacle : opt.static_obstacles) {
+        gkSimplex simplex;
+        simplex.nvrtx = 0;
+        auto distance = compute_minimum_distance(dynamicObstacle.polytope, staticObstacle.polytope, &simplex);
 
-      // If distance indicates a collision, return true immediately
-      if (distance <= 0) return true;
+        // If distance indicates a collision, return true immediately
+        if (distance <= 0) return true;
+      }
     }
-
-    // Move to the next state
-    begin += state_dim;
-    if (begin >= end) break;
   }
 
   // No collision detected
@@ -324,11 +323,10 @@ std::vector<std::vector<double>> ReachedSet::convertTo2D(std::vector<double>::co
   matrix.reserve(numRows);
 
   for (std::size_t i = 0; i < numRows; ++i) {
-    std::vector<double> row;
-    row.reserve(state_dim);
     auto rowStart = first + i * state_dim;
-    std::copy(rowStart, rowStart + state_dim, std::back_inserter(row));
-    matrix.emplace_back(std::move(row));
+    // Construct a row directly within `matrix`, avoiding a temporary vector.
+    // This uses the range constructor of std::vector to directly construct each row in place.
+    matrix.emplace_back(rowStart, rowStart + state_dim);
   }
 
   return matrix;
