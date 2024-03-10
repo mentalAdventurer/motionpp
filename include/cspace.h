@@ -25,14 +25,15 @@ struct DynamicObstacle{
     std::vector<double> polytope_data;
     std::unique_ptr<double*[]> compatability_array;
     int num_vertices;
-    std::function<std::vector<double>&(std::vector<double>&, const state_t& x0, const state_t& x1)> transform_polytope;
-    DynamicObstacle(){}
-    DynamicObstacle(const std::vector<double>& vertices, int num_vertices, decltype(transform_polytope) transform_fun);
+    state_t x_cur;
+    std::function<std::vector<double>&(std::vector<double>&, const state_t&, const state_t&)> transform_polytope;
+    DynamicObstacle(const std::vector<double>& vertices, int num_vertices, decltype(transform_polytope) transform_fun,state_t x_cur);
     ~DynamicObstacle(){};
     DynamicObstacle(const DynamicObstacle& other);
     DynamicObstacle& operator=(const DynamicObstacle& other);
     DynamicObstacle(DynamicObstacle&& other) noexcept;
     DynamicObstacle& operator=(DynamicObstacle&& other) noexcept;
+    std::vector<double>& transform_obstacle(std::vector<double>&, const state_t& x0, const state_t& xg); 
 };
 
 struct StaticObstacle{
@@ -40,7 +41,6 @@ struct StaticObstacle{
     std::vector<double> polytope_data;
     std::unique_ptr<double*[]> compatability_array;
     int num_vertices;
-    StaticObstacle(){}
     ~StaticObstacle(){};
     StaticObstacle(const std::vector<double>& vertices, int num_vertices);
     StaticObstacle(const StaticObstacle& other);
