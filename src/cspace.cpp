@@ -234,7 +234,33 @@ void ReachedSet::init_reacheable_points_primitives(const state_ptr x_ptr) {
 }
 
 bool ReachedSet::empty() { return states.empty(); }
-bool ReachedSet::collision(std::vector<double>::iterator, std::vector<double>::iterator, std::size_t) {
+
+bool ReachedSet::collision(std::vector<double>::iterator begin, std::vector<double>::iterator end,
+                           std::size_t state_dim) {
+  if (opt.dynamic_obstacles.empty() || opt.static_obstacles.empty() || begin >= end) {
+    return false;
+  }
+
+  for (auto& dynamicObstacle : opt.dynamic_obstacles) {
+    // Transform the dynamic obstacle's polytope data based on the current state
+    dynamicObstacle.polytope_data = dynamicObstacle.transform_obstacle(
+        dynamicObstacle.polytope_data, dynamicObstacle.x_cur, std::vector<double>(begin, begin + state_dim));
+
+    for (auto& staticObstacle : opt.static_obstacles) {
+      gkSimplex simplex;
+      simplex.nvrtx = 0;
+      auto distance = compute_minimum_distance(dynamicObstacle.polytope, staticObstacle.polytope, &simplex);
+
+      // If distance indicates a collision, return true immediately
+      if (distance <= 0) return true;
+    }
+
+    // Move to the next state
+    begin += state_dim;
+    if (begin >= end) break;
+  }
+
+  // No collision detected
   return false;
 }
 
