@@ -4,6 +4,108 @@
 
 using namespace cspace;
 
+DynamicObstacle::DynamicObstacle(const std::vector<double>& vertices, int num_vertices,
+                                 decltype(transform_polytope) transform_fun)
+    : polytope_data(vertices.begin(), vertices.end()),
+      compatability_array(std::make_unique<double*[]>(vertices.size())),
+      num_vertices(num_vertices),
+      transform_polytope(transform_fun) {
+  polytope.numpoints = num_vertices;
+  for (std::size_t i = 0; i < vertices.size(); i++) compatability_array[i] = &polytope_data.data()[i];
+  polytope.coord = compatability_array.get();
+}
+
+DynamicObstacle::DynamicObstacle(const DynamicObstacle& other)
+    : polytope(other.polytope),
+      polytope_data(other.polytope_data),
+      compatability_array(std::make_unique<double*[]>(other.polytope_data.size())),
+      num_vertices(other.num_vertices),
+      transform_polytope(other.transform_polytope) {
+  for (std::size_t i = 0; i < other.polytope_data.size(); i++)
+    compatability_array[i] = &polytope_data.data()[i];
+  polytope.coord = compatability_array.get();
+}
+
+DynamicObstacle& DynamicObstacle::operator=(const DynamicObstacle& other) {
+  if (this != &other) {
+    polytope = other.polytope;
+    polytope_data = other.polytope_data;
+    compatability_array = std::make_unique<double*[]>(other.polytope_data.size());
+    num_vertices = other.num_vertices;
+    transform_polytope = other.transform_polytope;
+    for (std::size_t i = 0; i < other.polytope_data.size(); i++)
+      compatability_array[i] = &polytope_data.data()[i];
+    polytope.coord = compatability_array.get();
+  }
+  return *this;
+}
+
+DynamicObstacle::DynamicObstacle(DynamicObstacle&& other) noexcept
+    : polytope(std::move(other.polytope)),
+      polytope_data(std::move(other.polytope_data)),
+      compatability_array(std::move(other.compatability_array)),
+      num_vertices(other.num_vertices),
+      transform_polytope(std::move(other.transform_polytope)) {}
+
+DynamicObstacle& DynamicObstacle::operator=(DynamicObstacle&& other) noexcept {
+  if (this != &other) {
+    polytope = std::move(other.polytope);
+    polytope_data = std::move(other.polytope_data);
+    compatability_array = std::move(other.compatability_array);
+    num_vertices = other.num_vertices;
+    transform_polytope = std::move(other.transform_polytope);
+  }
+  return *this;
+}
+
+StaticObstacle::StaticObstacle(const std::vector<double>& vertices, int num_vertices)
+    : polytope_data(vertices.begin(), vertices.end()),
+      compatability_array(std::make_unique<double*[]>(vertices.size())),
+      num_vertices(num_vertices) {
+  polytope.numpoints = num_vertices;
+  for (std::size_t i = 0; i < vertices.size(); i++) compatability_array[i] = &polytope_data.data()[i];
+  polytope.coord = compatability_array.get();
+}
+
+StaticObstacle::StaticObstacle(const StaticObstacle& other)
+    : polytope(other.polytope),
+      polytope_data(other.polytope_data),
+      compatability_array(std::make_unique<double*[]>(other.polytope_data.size())),
+      num_vertices(other.num_vertices) {
+  for (std::size_t i = 0; i < other.polytope_data.size(); i++)
+    compatability_array[i] = &polytope_data.data()[i];
+  polytope.coord = compatability_array.get();
+}
+
+StaticObstacle& StaticObstacle::operator=(const StaticObstacle& other) {
+  if (this != &other) {
+    polytope = other.polytope;
+    polytope_data = other.polytope_data;
+    compatability_array = std::make_unique<double*[]>(other.polytope_data.size());
+    num_vertices = other.num_vertices;
+    for (std::size_t i = 0; i < other.polytope_data.size(); i++)
+      compatability_array[i] = &polytope_data.data()[i];
+    polytope.coord = compatability_array.get();
+  }
+  return *this;
+}
+
+StaticObstacle::StaticObstacle(StaticObstacle&& other) noexcept
+    : polytope(std::move(other.polytope)),
+      polytope_data(std::move(other.polytope_data)),
+      compatability_array(std::move(other.compatability_array)),
+      num_vertices(other.num_vertices) {}
+
+StaticObstacle& StaticObstacle::operator=(StaticObstacle&& other) noexcept {
+  if (this != &other) {
+    polytope = std::move(other.polytope);
+    polytope_data = std::move(other.polytope_data);
+    compatability_array = std::move(other.compatability_array);
+    num_vertices = other.num_vertices;
+  }
+  return *this;
+}
+
 Voronoi::Voronoi(const std::size_t N, state_t x0, state_t xg, const Options::StateLimits& limits)
     : limits(limits) {
   points.resize(N + 2);

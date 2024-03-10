@@ -1,6 +1,7 @@
 #ifndef CSPACE_H
 #define CSPACE_H
 #include <KDTree.hpp>
+#include <openGJK/openGJK.h>
 #include <random>
 #include <vector>
 
@@ -19,10 +20,41 @@ using fun_simulator = std::function<std::vector<double>(std::vector<double>::con
 using fun_inputs = std::function<std::pair<std::vector<double>, std::vector<float>>(const cspace::state_t&)>;
 using fun_motion_primitive = std::function<std::vector<trajTuple>(const state_t&)>; 
 
+struct DynamicObstacle{
+    gkPolytope polytope;
+    std::vector<double> polytope_data;
+    std::unique_ptr<double*[]> compatability_array;
+    int num_vertices;
+    std::function<std::vector<double>&(std::vector<double>&, const state_t& x0, const state_t& x1)> transform_polytope;
+    DynamicObstacle(){}
+    DynamicObstacle(const std::vector<double>& vertices, int num_vertices, decltype(transform_polytope) transform_fun);
+    ~DynamicObstacle(){};
+    DynamicObstacle(const DynamicObstacle& other);
+    DynamicObstacle& operator=(const DynamicObstacle& other);
+    DynamicObstacle(DynamicObstacle&& other) noexcept;
+    DynamicObstacle& operator=(DynamicObstacle&& other) noexcept;
+};
+
+struct StaticObstacle{
+    gkPolytope polytope;
+    std::vector<double> polytope_data;
+    std::unique_ptr<double*[]> compatability_array;
+    int num_vertices;
+    StaticObstacle(){}
+    ~StaticObstacle(){};
+    StaticObstacle(const std::vector<double>& vertices, int num_vertices);
+    StaticObstacle(const StaticObstacle& other);
+    StaticObstacle& operator=(const StaticObstacle& other);
+    StaticObstacle(StaticObstacle&& other) noexcept;
+    StaticObstacle& operator=(StaticObstacle&& other) noexcept;
+};
+
 struct Options {
     using StateLimits = std::vector<std::pair<double,double>>;
     std::size_t NumberOfPoints;
     StateLimits limits;
+    std::vector<DynamicObstacle> dynamic_obstacles;
+    std::vector<StaticObstacle> static_obstacles;
     Options(std::size_t NumberOfPoints,StateLimits limits) : NumberOfPoints(NumberOfPoints), limits(limits) {}
 };
 
