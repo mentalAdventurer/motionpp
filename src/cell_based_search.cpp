@@ -4,8 +4,8 @@
 #include <iostream>
 
 std::pair<Graph, cspace::Voronoi> cellBasedSearch(const cspace::state_t& x0, const cspace::state_t& xg,
-                                                  const cspace::Options& opt,
-                                                  cspace::ReachedSet& R, cspace::Voronoi& P) {
+                                                  const cspace::Options& opt, cspace::ReachedSet& R,
+                                                  cspace::Voronoi& P) {
   namespace cs = cspace;
   cs::state_ptr x0_ptr = std::make_shared<const cs::state_t>(x0);
   Graph G(x0_ptr);
@@ -42,7 +42,7 @@ std::pair<Graph, cspace::Voronoi> cellBasedSearch(const cspace::state_t& x0, con
                                                   cspace::fun_simulator simulator) {
   namespace cs = cspace;
   cs::Voronoi P(opt.NumberOfPoints, x0, xg, opt.limits);
-  cs::ReachedSet R(simulator, generateInput);
+  cs::ReachedSet R(simulator, generateInput, opt);
   return cellBasedSearch(x0, xg, opt, R, P);
 }
 
@@ -51,6 +51,6 @@ std::pair<Graph, cspace::Voronoi> cellBasedSearch(const cspace::state_t& x0, con
                                                   cspace::fun_motion_primitive primitives) {
   namespace cs = cspace;
   cs::Voronoi P(opt.NumberOfPoints, x0, xg, opt.limits);
-  cs::ReachedSet R(primitives);
+  cs::ReachedSet R(primitives, opt);
   return cellBasedSearch(x0, xg, opt, R, P);
 }

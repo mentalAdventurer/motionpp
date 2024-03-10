@@ -176,10 +176,11 @@ auto Voronoi::begin() -> decltype(points.begin()) { return points.begin(); }
 auto Voronoi::end() -> decltype(points.end()) { return points.end(); }
 
 // ReachedSet
-ReachedSet::ReachedSet(fun_simulator simulator, fun_inputs generateInput)
-    : simulator(simulator), generateInput(generateInput) {}
+ReachedSet::ReachedSet(fun_simulator simulator, fun_inputs generateInput, Options options)
+    : simulator(simulator), generateInput(generateInput), opt(options) {}
 
-ReachedSet::ReachedSet(fun_motion_primitive primitives) : primitives(primitives) {}
+ReachedSet::ReachedSet(fun_motion_primitive primitives, Options options)
+    : primitives(primitives), opt(options) {}
 
 void ReachedSet::operator()(const state_ptr x_ptr) {
   // Depeding on which constructor was used, call the appropriate initialization function
@@ -212,7 +213,7 @@ void ReachedSet::init_reacheable_points_simulator(const state_ptr x_ptr) {
 void ReachedSet::init_reacheable_points_primitives(const state_ptr x_ptr) {
   auto primitives_for_x0 = primitives(*x_ptr);
 
-  for(auto& [time, states, input] : primitives_for_x0){
+  for (auto& [time, states, input] : primitives_for_x0) {
     if (!collision(states.begin(), states.end(), x_ptr->size())) {
       add_reached_state(states.end() - x_ptr->size(), x_ptr->size());
       add_reached_input(input.begin(), input.end(), time.back(), input.size() / time.size());
@@ -225,7 +226,8 @@ bool ReachedSet::collision(std::vector<double>::iterator, std::vector<double>::i
   return false;
 }
 
-void ReachedSet::add_reached_state(std::vector<double>::const_iterator first, std::vector<double>::const_iterator last) {
+void ReachedSet::add_reached_state(std::vector<double>::const_iterator first,
+                                   std::vector<double>::const_iterator last) {
   state_ptr x_ptr(new state_t(first, last));
   states.push_back(x_ptr);
 }
@@ -235,9 +237,10 @@ void ReachedSet::add_reached_state(std::vector<double>::const_iterator first, st
   states.push_back(x_ptr);
 }
 
-void ReachedSet::add_reached_input(std::vector<double>::const_iterator first,std::vector<double>::const_iterator last, float time,std::size_t input_dim) {
-  input_traj_ptr input_ptr(
-      new input_trajectory_t(convertTo2D(first, last, input_dim)));
+void ReachedSet::add_reached_input(std::vector<double>::const_iterator first,
+                                   std::vector<double>::const_iterator last, float time,
+                                   std::size_t input_dim) {
+  input_traj_ptr input_ptr(new input_trajectory_t(convertTo2D(first, last, input_dim)));
   times.push_back(time);
   input_traj.push_back(std::move(input_ptr));
 }

@@ -81,8 +81,8 @@ class Voronoi {
 
 class ReachedSet {
  public:
-  ReachedSet(fun_simulator simulator, fun_inputs generateInput);
-  ReachedSet(fun_motion_primitive primitives);
+  ReachedSet(fun_simulator simulator, fun_inputs generateInput, Options options);
+  ReachedSet(fun_motion_primitive primitives, Options options);
   void operator()(const state_ptr x_ptr);
   void init_reacheable_points_simulator(const state_ptr x_ptr);
   void init_reacheable_points_primitives(const state_ptr x_ptr);
@@ -97,6 +97,7 @@ class ReachedSet {
   fun_simulator simulator = nullptr;
   fun_inputs generateInput = nullptr;
   fun_motion_primitive primitives = nullptr;
+  Options opt;
   bool collision(std::vector<double>::iterator,std::vector<double>::iterator,std::size_t);
   void add_reached_state(std::vector<double>::const_iterator first, std::size_t states_dim);
   void add_reached_state(std::vector<double>::const_iterator first, std::vector<double>::const_iterator last);
