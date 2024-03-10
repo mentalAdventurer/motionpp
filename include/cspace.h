@@ -1,9 +1,11 @@
 #ifndef CSPACE_H
 #define CSPACE_H
 #include <KDTree.hpp>
-#include <openGJK/openGJK.h>
 #include <random>
 #include <vector>
+extern "C" {
+#include <openGJK/openGJK.h>
+}
 
 namespace cspace {
 
