@@ -41,5 +41,4 @@ add_library(${PROJECT_NAME} STATIC
 
 # Linking Libraries
 target_include_directories(${PROJECT_NAME} PUBLIC include)
-#target_link_directories(simulator PUBLIC)
-target_link_libraries(${PROJECT_NAME} PUBLIC KDTree opengjk_ce) 
+target_link_libraries(${PROJECT_NAME} PUBLIC KDTree obj_openGJK) 
