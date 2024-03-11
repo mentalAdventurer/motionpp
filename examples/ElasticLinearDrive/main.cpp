@@ -122,13 +122,5 @@ int main() {
     plotStates(traj);
   }
 
-  if (G.get_success() && plot3) {
-    auto state_ptr = G.back().state;
-    auto [input_traj, time] = G.get_input(state_ptr);
-    auto traj = ElasticLinearDrive::eulerIntegrate_state(*state_ptr, input_traj, time);
-    plotTrajectory(traj, time);
-  }
-  plt::show();
-
   return 0;
 }

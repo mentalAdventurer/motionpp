@@ -16,9 +16,9 @@ std::vector<double> dynamics(vec_iter x, vec_iter u, std::size_t n) {
 
   cs::state_t dxdt(n);
   dxdt[0] = x[1];
-  dxdt[1] = (-d * x[1] - k * x[0] + u[0]) / m;
+  dxdt[1] = (-d * x[1] - k * x[0] + *u) / m;
   dxdt[2] = x[3];
-  dxdt[3] = dxdt[1] - u[0] / m;
+  dxdt[3] = dxdt[1] - *u / m;
 
   return dxdt;
 }
@@ -34,7 +34,7 @@ cs::trajectory_t eulerIntegrate_state(const cs::state_t &x0,
   cs::state_t x = x0;
 
   for (std::size_t i = 0; i < time_steps; i++) {
-    cs::state_t dxdt = dynamics(x.begin(), u[i].begin(), x.size());
+    cs::state_t dxdt = dynamics(x.begin(), u.begin()+i, x.size());
     for (std::size_t j = 0; j < x.size(); j++)
       x[j] = x[j] + dt * dxdt[j];
     x_traj[i + 1] = x;
@@ -59,16 +59,16 @@ std::vector<double> eulerIntegrate(std::vector<double>::const_iterator x0,
 
 std::pair<std::vector<double>, std::vector<float>> getMotionPrimitives(const cs::state_t &x0) {
   std::vector<float> times(10,0.5); // increase precision and range
-  std::size_t dim = 4; // const
+  std::size_t dim = 1; // const
   std::size_t step = 6; // increase precision
   double max_input = 4; // increase range
 
   std::vector<double> motion_primitives(dim * step * times.size());
-  double delte_input = 2 * max_input / (times.size() - 1);
+  double delta_input = 2 * max_input / (times.size() - 1);
 
   for (std::size_t i = 0; i < times.size(); i++) 
     for (std::size_t j = 0; j < dim*step; j++) 
-      motion_primitives[j+i*dim*step] = -max_input + delte_input * i;
+      motion_primitives[j+i*dim*step] = -max_input + delta_input * i;
 
   return std::make_pair(motion_primitives, times);
 }
