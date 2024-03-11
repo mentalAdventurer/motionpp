@@ -4,7 +4,6 @@
 #include <iostream>
 
 #include "cell_based_search.h"
-#include "inputShaping.h"
 #include "model.h"
 #include "plot.h"
 
@@ -108,12 +107,12 @@ int main() {
 
   // Define Start and Goal
   cspace::state_t x0 = {0, 0, 0, 0};
-  cspace::state_t xg = {0, 0, 0.4, 0.0};
+  cspace::state_t xg = {0, 0, 1, 0.0};
 
-  cspace::Options opt(1000, {
+  cspace::Options opt(2000, {
                                 std::make_pair(0.0, 0.0),
                                 std::make_pair(0.0, 0.0),
-                                std::make_pair(-1, 1),
+                                std::make_pair(-3, 3),
                                 std::make_pair(-0.5, 0.5),
                             });
   // Define Obstacles
@@ -138,7 +137,13 @@ int main() {
   std::cout << "Final State: " << G.back().state->at(0) << " " << G.back().state->at(1) << " "
             << G.back().state->at(2) << " " << G.back().state->at(3) << std::endl;
   //plot_graph(G, x0, xg);
-  plot_trajectory(G.get_trajectory(G.back().state));
+  trajectory_t traj = G.get_trajectory(G.back().state);
+  auto [input,time] = G.get_input(G.back().state);
+  auto traj_from_input = simulate_system({0, 0, 0, 0}, input, param::dt);
+  plot_trajectory(traj);
+  plot_trajectory_time(traj, time);
+  plot_trajectory_flat(traj_from_input, time);
+  //plot_input(input, time);
 
   return 0;
 }
