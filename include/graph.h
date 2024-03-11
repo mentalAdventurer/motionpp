@@ -27,7 +27,7 @@ class Graph {
   void add_vertex(std::shared_ptr<const cspace::state_t> x);
   void add_edge(std::shared_ptr<const cspace::state_t> x1, std::shared_ptr<const cspace::state_t> x2,
                 cspace::input_traj_ptr u, float time);
-  std::pair<cspace::trajectory_t,float> get_input(std::shared_ptr<const cspace::state_t> x);
+  std::pair<cspace::input_trajectory_t,float> get_input(std::shared_ptr<const cspace::state_t> x);
   cspace::trajectory_t get_trajectory(std::shared_ptr<const cspace::state_t> x);
   Vertex& front();
   Vertex& back();

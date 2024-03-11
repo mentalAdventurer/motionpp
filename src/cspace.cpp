@@ -277,15 +277,14 @@ void ReachedSet::add_reached_state(std::vector<double>::const_iterator first, st
 void ReachedSet::add_reached_input(std::vector<double>::const_iterator first,
                                    std::vector<double>::const_iterator last, float time,
                                    std::size_t input_dim) {
-  input_traj_ptr input_ptr(new input_trajectory_t(convertTo2D(first, last, input_dim)));
+  input_traj_ptr input_ptr(new input_trajectory_t(first, last));
   times.push_back(time);
   input_traj.push_back(std::move(input_ptr));
 }
 
 void ReachedSet::add_reached_input(std::vector<double>::const_iterator first, float time,
                                    std::size_t traj_dim, std::size_t states_dim) {
-  input_traj_ptr input_ptr(
-      new input_trajectory_t(convertTo2D(first, first + traj_dim * states_dim, states_dim)));
+  input_traj_ptr input_ptr(new input_trajectory_t(first, first + traj_dim * states_dim));
 
   times.push_back(time);
   input_traj.push_back(std::move(input_ptr));
