@@ -121,12 +121,12 @@ int main() {
   //opt.dynamic_obstacles.push_back(upper_cart);
   //opt.static_obstacles.push_back(block);
 
-  cspace::state_t x_test = {0, 0, 0.1, 0.2};
+  cspace::state_t x_test = {0, 0, 0, 0};
   auto primitives_x0 = primitives(x_test);
   std::cout << "Number of primitives: " << primitives_x0.size() << std::endl;
-  //plot_states_and_input(std::get<0>(primitives_x0[1]), std::get<1>(primitives_x0[1]),
-  //                     std::get<2>(primitives_x0[1]));
-  //plot_primitives(primitives_x0);
+  plot_states_and_input(std::get<0>(primitives_x0[1]), std::get<1>(primitives_x0[1]),
+                       std::get<2>(primitives_x0[1]));
+  plot_primitives(primitives_x0);
 
   // Results
   auto [G, P] = cellBasedSearch(x0, xg, opt, primitives);
@@ -136,14 +136,14 @@ int main() {
             << G.front().state->at(2) << " " << G.front().state->at(3) << std::endl;
   std::cout << "Final State: " << G.back().state->at(0) << " " << G.back().state->at(1) << " "
             << G.back().state->at(2) << " " << G.back().state->at(3) << std::endl;
-  //plot_graph(G, x0, xg);
+  plot_graph(G, x0, xg);
   trajectory_t traj = G.get_trajectory(G.back().state);
   auto [input,time] = G.get_input(G.back().state);
   auto traj_from_input = simulate_system({0, 0, 0, 0}, input, param::dt);
   plot_trajectory(traj);
   plot_trajectory_time(traj, time);
   plot_trajectory_flat(traj_from_input, time);
-  //plot_input(input, time);
+  plot_input(input, time);
 
   return 0;
 }
