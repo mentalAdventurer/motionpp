@@ -30,10 +30,8 @@ vec_double calculate_input(vec_double x0, cvec_double accel, double dt){
 
 vec_double simulate_system(vec_double x, cvec_double& inputs, double dt){
   vec_double trajc(x.size()*inputs.size(),0);
-  for (std::size_t i = 0; i < inputs.size(); i+=2){
-    auto dxdt = dynamics(std::vector<double>(x.begin(),x.begin()+4),inputs[i]);
-    auto dxdt_y = dynamics(std::vector<double>(x.begin()+4,x.end()),inputs[i+1]);
-    dxdt.insert(dxdt.end(),dxdt_y.begin(),dxdt_y.end());
+  for (std::size_t i = 0; i < inputs.size(); i++){
+    auto dxdt = dynamics(x,inputs[i]);
     for (std::size_t j = 0; j < x.size(); j++){
       x[j] += dxdt[j] * dt;
       trajc[i*x.size() + j] = x[j];

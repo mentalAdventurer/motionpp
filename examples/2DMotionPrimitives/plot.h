@@ -68,24 +68,20 @@ void plot_primitives(std::vector<trajTuple>& primitives) {
   plt::show();
 }
 
-void plot_graph(Graph& G, cspace::state_t x0, cspace::state_t xg) {
+void plot_graph(Graph& G, cspace::state_t x0, cspace::state_t xg,
+                const std::vector<std::vector<double>>& traj = {}) {
   namespace plt = matplot;
-  std::vector<double> x, xd, z, zd, x_x, xd_x, z_x, zd_x, x_y, xd_y, z_y, zd_y;
+  std::vector<std::vector<double>> graph_repacked(8);
 
-  for ([[maybe_unused]] const auto& [states, out, in] : G) {
+  for (const auto& [states, out, in] : G) {
     if (states->size() == 8) {
-      x_x.push_back(states->at(0));
-      xd_x.push_back(states->at(1));
-      z_x.push_back(states->at(2));
-      zd_x.push_back(states->at(3));
-      x_y.push_back(states->at(4));
-      xd_y.push_back(states->at(5));
-      z_y.push_back(states->at(6));
-      zd_y.push_back(states->at(7));
+      for (std::size_t i = 0; i < 8; i++) {
+        graph_repacked[i].push_back(states->at(i));
+      }
     }
   }
   plt::figure();
-  plt::plot(z_x, z_y, ".")->marker_size(5);
+  plt::plot(graph_repacked[2], graph_repacked[6], ".")->marker_size(5);
   plt::hold(true);
   plt::plot({x0[2]}, {x0[6]}, "bx")->marker_size(15);
   plt::plot({xg[2]}, {xg[6]}, "gx")->marker_size(15);
@@ -93,6 +89,19 @@ void plot_graph(Graph& G, cspace::state_t x0, cspace::state_t xg) {
   plt::grid(true);
   plt::xlabel("z_x");
   plt::ylabel("z_y");
+
+  // Plot the trajectory
+  if (!traj.empty()) {
+    std::vector<std::vector<double>> traj_repacked(8);
+    for(auto& xi : traj) {
+      for (std::size_t i = 0; i < 8; i++) {
+        traj_repacked[i].push_back(xi[i]);
+      }
+    }
+    plt::plot(traj_repacked[2], traj_repacked[6])->line_width(2);
+    plt::plot(traj_repacked[2], traj_repacked[6], ".")->marker_size(5);
+  }
+
   plt::show();
 }
 

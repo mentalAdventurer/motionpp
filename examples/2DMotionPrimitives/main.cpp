@@ -11,7 +11,7 @@ using primitiveTuple = std::tuple<std::vector<double>, std::vector<double>, std:
 
 struct MotionPrimitive {
   std::vector<trajTuple> template_primitives;
-  std::vector<double> speeds = {0.0 ,0.5,-0.5};
+  std::vector<double> speeds = {0.0, 0.2, -0.2, 0.5, -0.5};
   std::vector<std::pair<double, double>> speeds_xy;
   double max_speed = 0.55;
   MotionPrimitive();
@@ -91,16 +91,9 @@ MotionPrimitive::MotionPrimitive() {
       std::vector<double> traj;
       std::vector<double> input;
       for (std::size_t j = 0; j < time_x.size(); j++) {
-        traj.push_back(traj_x[j * 4]);
-        traj.push_back(traj_x[j * 4 + 1]);
-        traj.push_back(traj_x[j * 4 + 2]);
-        traj.push_back(traj_x[j * 4 + 3]);
-        traj.push_back(traj_y[j * 4]);
-        traj.push_back(traj_y[j * 4 + 1]);
-        traj.push_back(traj_y[j * 4 + 2]);
-        traj.push_back(traj_y[j * 4 + 3]);
-        input.push_back(input_x[j]);
-        input.push_back(input_y[j]);
+        traj.insert(traj.end(), traj_x.begin() + j * 4, traj_x.begin() + (j * 4 + 4));
+        traj.insert(traj.end(), traj_y.begin() + j * 4, traj_y.begin() + (j * 4 + 4));
+        input.insert(input.end(), {input_x[j], input_y[j]});
       }
       speeds_xy.push_back({speeds[index_x], speeds[index_y]});
       template_primitives.push_back(std::make_tuple(time_x, traj, input));
@@ -143,18 +136,44 @@ int main() {
 
   // Define Start and Goal
   cspace::state_t x0 = {0, 0, 0, 0, 0, 0, 0, 0};
-  cspace::state_t xg = {0, 0, 0.2, 0, 0, 0, 0.2, 0};
+  cspace::state_t xg = {0, 0, 0.5, 0, 0, 0, 0.5, 0};
 
-  cspace::Options opt(20000, {
-                                std::make_pair(0.0, 0.0),
-                                std::make_pair(0.0, 0.0),
-                                std::make_pair(-3, 3),
-                                std::make_pair(-0.5, 0.5),
-                                std::make_pair(0.0, 0.0),
-                                std::make_pair(0.0, 0.0),
-                                std::make_pair(-3, 3),
-                                std::make_pair(-0.5, 0.5),
-                            });
+  cspace::Options opt(21000, {
+                                 std::make_pair(0.0, 0.0),
+                                 std::make_pair(0.0, 0.0),
+                                 std::make_pair(-3, 3),
+                                 std::make_pair(-0.5, 0.5),
+                                 std::make_pair(0.0, 0.0),
+                                 std::make_pair(0.0, 0.0),
+                                 std::make_pair(-3, 3),
+                                 std::make_pair(-0.5, 0.5),
+                             });
+  // Define Metric (optional)
+  auto metric = [xg](const std::shared_ptr<const std::vector<double>>& x,
+                     const std::shared_ptr<const std::vector<double>>& u, const float& time) {
+    float timeCoeff = 0;
+    float inputCoeff = 0.0;
+    float distanceCoeff = 1.0;
+
+    // Calculate sum of the absolute values of u
+    float absSumU = std::transform_reduce(
+        u->begin(), u->end(),
+        0.0,                                     // Initial value
+        std::plus<>(),                           // Summation operation
+        [](float val) { return std::abs(val); }  // Transformation operation (absolute value)
+    );
+    float meanAbsU = absSumU / u->size();
+
+    // Distance to goal
+    float distance = std::sqrt(std::pow(x->at(2) - xg[2], 2) + std::pow(x->at(6) - xg[6], 2));
+
+    // Calculate the final cost
+    float cost = timeCoeff * time + inputCoeff * meanAbsU + distanceCoeff * distance;
+
+    return cost;
+  };
+  opt.sort_metric = metric;
+
   // Define Obstacles
   // cspace::DynamicObstacle upper_cart({0.0, 0.0, 0, 0.01, 0, 0, 0.01, 0.01, 0, 0.0, 0.01, 0}, 4,
   // move_obstacle,
@@ -163,11 +182,11 @@ int main() {
   // opt.dynamic_obstacles.push_back(upper_cart);
   // opt.static_obstacles.push_back(block);
 
-  cspace::state_t x_test = {0, 0, 0.0, 0.1, 0, 0, 0.1, 0.1};
+  cspace::state_t x_test = {0, 0, 0.0, 0.1, 0, 0, 0.1, 0.0};
   auto primitives_x0 = primitives(x_test);
   std::cout << "Number of primitives: " << primitives_x0.size() << std::endl;
-  //plot_states_and_input(std::get<0>(primitives_x0[1]), std::get<1>(primitives_x0[1]),
-  //                      std::get<2>(primitives_x0[1]));
+  // plot_states_and_input(std::get<0>(primitives_x0[1]), std::get<1>(primitives_x0[1]),
+  //                       std::get<2>(primitives_x0[1]));
   plot_primitives(primitives_x0);
 
   // Results
@@ -175,21 +194,21 @@ int main() {
   std::cout << "Success: " << G.get_success() << std::endl;
   std::cout << "Number of Vertices: " << G.size_vertices() << std::endl;
   std::cout << "Initial State: " << G.front().state->at(0) << " " << G.front().state->at(1) << " "
-            << G.front().state->at(2) << " " << G.front().state->at(3) 
-            << " " << G.front().state->at(4) << " " << G.front().state->at(5)
-            << " " << G.front().state->at(6) << " " << G.front().state->at(7) << std::endl;
+            << G.front().state->at(2) << " " << G.front().state->at(3) << " " << G.front().state->at(4) << " "
+            << G.front().state->at(5) << " " << G.front().state->at(6) << " " << G.front().state->at(7)
+            << std::endl;
   std::cout << "Final State: " << G.back().state->at(0) << " " << G.back().state->at(1) << " "
-            << G.back().state->at(2) << " " << G.back().state->at(3)
-            << " " << G.back().state->at(4) << " " << G.back().state->at(5)
-            << " " << G.back().state->at(6) << " " << G.back().state->at(7) << std::endl;
-  plot_graph(G, x0, xg);
+            << G.back().state->at(2) << " " << G.back().state->at(3) << " " << G.back().state->at(4) << " "
+            << G.back().state->at(5) << " " << G.back().state->at(6) << " " << G.back().state->at(7)
+            << std::endl;
   trajectory_t traj = G.get_trajectory(G.back().state);
   auto [input, time] = G.get_input(G.back().state);
   auto traj_from_input = simulate_system(x0, input, param::dt);
-  plot_trajectory(traj);
-  //plot_trajectory_time(traj, time);
-  //plot_trajectory_flat(traj_from_input, time);
-  //plot_input(input, time);
+  // plot_graph(G, x0, xg);
+  plot_graph(G, x0, xg, traj);
+  // plot_trajectory_time(traj, time);
+  // plot_trajectory_flat(traj_from_input, time);
+  // plot_input(input, time);
 
   return 0;
 }
