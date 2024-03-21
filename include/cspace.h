@@ -56,11 +56,15 @@ struct StaticObstacle {
 
 struct Options {
   using StateLimits = std::vector<std::pair<double, double>>;
+  using metric_func =
+      std::function<float(const cspace::state_ptr&, const cspace::input_traj_ptr&, const float&)>;
   std::size_t NumberOfPoints;
   StateLimits limits;
+  metric_func sort_metric;
   std::vector<DynamicObstacle> dynamic_obstacles;
   std::vector<StaticObstacle> static_obstacles;
-  Options(std::size_t NumberOfPoints, StateLimits limits) : NumberOfPoints(NumberOfPoints), limits(limits) {}
+  Options(std::size_t NumberOfPoints, StateLimits limits)
+      : NumberOfPoints(NumberOfPoints), limits(limits), sort_metric(nullptr) {}
 };
 
 class Voronoi {

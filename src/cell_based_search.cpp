@@ -9,7 +9,7 @@ std::pair<Graph, cspace::Voronoi> cellBasedSearch(const cspace::state_t& x0, con
   namespace cs = cspace;
   cs::state_ptr x0_ptr = std::make_shared<const cs::state_t>(x0);
   Graph G(x0_ptr);
-  Queue Q(x0_ptr);
+  Queue Q(x0_ptr, opt.sort_metric);
 
   // Start Main Loop
   auto start = std::chrono::high_resolution_clock::now();

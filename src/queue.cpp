@@ -1,10 +1,23 @@
 #include "queue.h"
 
+#include <iostream>
+
 Queue::Queue(const cspace::state_ptr& x0) {
   // Use default metric if no metric is provided
   metric = [this](cspace::state_ptr x, cspace::input_traj_ptr u, float time) {
     return this->defaultMetric(x, u, time);
   };
+  queueMap.insert(std::make_pair(0, x0));
+}
+
+Queue::Queue(const cspace::state_ptr& x0, cspace::Options::metric_func sort_metric) {
+  if (sort_metric == nullptr) {
+    metric = [this](cspace::state_ptr x, cspace::input_traj_ptr u, float time) {
+      return this->defaultMetric(x, u, time);
+    };
+  } else {
+    metric = sort_metric;
+  }
   queueMap.insert(std::make_pair(0, x0));
 }
 
@@ -21,9 +34,7 @@ Queue::StateCostPair Queue::pop() {
   return {x, cost};
 }
 
-bool Queue::empty() {
-  return queueMap.empty();
-}
+bool Queue::empty() { return queueMap.empty(); }
 
 float Queue::defaultMetric(const cspace::state_ptr& x, const cspace::input_traj_ptr& u, const float& time) {
   return time;
