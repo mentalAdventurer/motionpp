@@ -176,7 +176,7 @@ bool Voronoi::visit(state_t x) {
 state_t Voronoi::random_state(const std::size_t state_dim) {
   std::vector<double> randmo_vector(state_dim);
   std::random_device rd;
-  std::mt19937 gen(rd());
+  static std::mt19937 gen(1111);
   for (std::size_t i = 0; i < state_dim; i++) {
     std::uniform_real_distribution<> dis(limits[i].first, limits[i].second);
     randmo_vector[i] = dis(gen);
