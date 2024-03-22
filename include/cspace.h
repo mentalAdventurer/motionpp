@@ -3,6 +3,9 @@
 #include <KDTree.hpp>
 #include <random>
 #include <vector>
+
+#include "annoylib.h"
+#include "kissrandom.h"
 extern "C" {
 #include <openGJK/openGJK.h>
 }
@@ -69,6 +72,9 @@ struct Options {
 
 class Voronoi {
  private:
+  Annoy::AnnoyIndex<int, double, Annoy::Euclidean, Annoy::Kiss32Random,
+                    Annoy::AnnoyIndexSingleThreadedBuildPolicy>
+      tree;
   std::unique_ptr<KDTree> kdtree;
   Options::StateLimits limits;
   std::vector<state_t> points;
@@ -86,6 +92,8 @@ class Voronoi {
   bool target_reached();
   auto begin() -> decltype(points.begin());
   auto end() -> decltype(points.end());
+  int search_k = 1;
+  int n_trees = 100;
 };
 
 class ReachedSet {

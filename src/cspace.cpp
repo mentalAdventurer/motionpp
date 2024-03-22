@@ -119,7 +119,7 @@ StaticObstacle& StaticObstacle::operator=(StaticObstacle&& other) noexcept {
 }
 
 Voronoi::Voronoi(const std::size_t N, state_t x0, state_t xg, const Options::StateLimits& limits)
-    : limits(limits) {
+    : tree(x0.size()), limits(limits) {
   points.resize(N + 2);
   points[0] = x0;
 
@@ -139,14 +139,24 @@ Voronoi::Voronoi(const std::size_t N, state_t x0, state_t xg, const Options::Sta
 
   // Create the kdTree
   kdtree = std::make_unique<KDTree>(points);
+
+  // Create Annoy Tree
+  for (std::size_t i = 0; i < points.size(); i++) {
+    tree.add_item(i, points[i].data());
+  }
+  tree.build(n_treen_trees);
+  tree.save("voronoi.tree");
 }
 
 Voronoi::Voronoi(Voronoi&& other) noexcept
-    : kdtree(std::move(other.kdtree)),
+    : tree(other.points[0].size()),
+      kdtree(std::move(other.kdtree)),
       limits(std::move(other.limits)),
       points(std::move(other.points)),
       points_visited(std::move(other.points_visited)),
-      xg_index(other.xg_index) {}
+      xg_index(other.xg_index) {
+  tree.load("voronoi.tree");
+}
 
 Voronoi& Voronoi::operator=(Voronoi&& other) noexcept {
   if (this != &other) {
@@ -155,13 +165,22 @@ Voronoi& Voronoi::operator=(Voronoi&& other) noexcept {
     points = std::move(other.points);
     points_visited = std::move(other.points_visited);
     xg_index = other.xg_index;
+    tree.load("voronoi.tree");
   }
   return *this;
 }
 
 bool Voronoi::visit(state_t x) {
   // Find the nearest neighbor to 'x' using the kdTree
-  int nearestIndex = kdtree->nearest_index(x);
+  int nearestIndex = -1;
+  // Choose the nearest neighbor based on the tree type
+  if (false) {
+    nearestIndex = kdtree->nearest_index(x);
+  } else {
+    std::vector<int> nearestIndexVec;
+    tree.get_nns_by_vector(x.data(), 1, search_k, &nearestIndexVec, nullptr);
+    nearestIndex = nearestIndexVec[0];
+  }
 
   // Check if the point is already visited
   if (points_visited[nearestIndex]) {
