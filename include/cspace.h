@@ -26,35 +26,30 @@ using fun_simulator =
 using fun_inputs = std::function<std::pair<std::vector<double>, std::vector<float>>(const cspace::state_t&)>;
 using fun_motion_primitive = std::function<std::vector<trajTuple>(const state_t&)>;
 
-struct DynamicObstacle {
+class StaticObstacle {
+ public:
   gkPolytope polytope;
-  std::vector<double> polytope_data;
+  std::vector<std::vector<double>> polytope_data;
   std::unique_ptr<double*[]> compatability_array;
   int num_vertices;
-  state_t x_cur;
-  std::function<std::vector<double>&(std::vector<double>&, const state_t&, const state_t&)>
-      transform_polytope;
-  DynamicObstacle(const std::vector<double>& vertices, int num_vertices,
-                  decltype(transform_polytope) transform_fun, state_t x_cur);
-  ~DynamicObstacle(){};
-  DynamicObstacle(const DynamicObstacle& other);
-  DynamicObstacle& operator=(const DynamicObstacle& other);
-  DynamicObstacle(DynamicObstacle&& other) noexcept;
-  DynamicObstacle& operator=(DynamicObstacle&& other) noexcept;
-  std::vector<double>& transform_obstacle(std::vector<double>&, const state_t& x0, const state_t& xg);
-};
-
-struct StaticObstacle {
-  gkPolytope polytope;
-  std::vector<double> polytope_data;
-  std::unique_ptr<double*[]> compatability_array;
-  int num_vertices;
-  ~StaticObstacle(){};
-  StaticObstacle(const std::vector<double>& vertices, int num_vertices);
+  StaticObstacle(const std::vector<std::vector<double>>& vertices);
   StaticObstacle(const StaticObstacle& other);
+  ~StaticObstacle(){};
   StaticObstacle& operator=(const StaticObstacle& other);
   StaticObstacle(StaticObstacle&& other) noexcept;
   StaticObstacle& operator=(StaticObstacle&& other) noexcept;
+};
+
+class DynamicObstacle : public StaticObstacle {
+ public:
+  state_t x_cur;
+  std::function<std::vector<std::vector<double>>&(std::vector<std::vector<double>>&, const state_t&,
+                                                  const state_t&)>
+      transform_polytope;
+  std::vector<std::vector<double>>& transform_obstacle(std::vector<std::vector<double>>&, const state_t& x0,
+                                                       const state_t& xg);
+  DynamicObstacle(const std::vector<std::vector<double>>& vertices,
+                  decltype(transform_polytope) transform_fun, state_t x_cur);
 };
 
 struct Options {
