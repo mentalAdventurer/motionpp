@@ -20,13 +20,15 @@ struct MotionPrimitive {
   void equalize_primitive_length(std::vector<trajTuple>& primitive1, std::vector<trajTuple>& primitive2);
 };
 
-std::vector<double>& move_obstacle(std::vector<double>& obstacle, const cspace::state_t& x0,
+std::vector<std::vector<double>>& move_obstacle(std::vector<std::vector<double>>& obstacle, const cspace::state_t& x0,
                                    const cspace::state_t& xg) {
-  double distance = xg[2] - x0[2];
+  double distance_x = xg[2] - x0[2];
+  double distance_y = xg[6] - x0[6];
 
-  // 1D Movement
-  for (std::size_t i = 0; i < obstacle.size(); i += 3) {
-    obstacle[i] += distance;
+  // 2D Movement
+  for(auto& vertex : obstacle) {
+    vertex[0] += distance_x;
+    vertex[1] += distance_y;
   }
 
   return obstacle;
@@ -88,15 +90,17 @@ MotionPrimitive::MotionPrimitive() {
       equilize_primitive_length(primitive_x, primitive_y);
       auto& [time_x, traj_x, input_x] = primitive_x;
       auto& [time_y, traj_y, input_y] = primitive_y;
-      std::vector<double> traj;
-      std::vector<double> input;
+      std::vector<double> traj, input, time;
+      std::vector<std::size_t> index_coll = {0, time.size() / 4, time.size() / 2, time_x.size() * 3 / 4,
+                                             time_x.size() - 1};  // Index for collision detection
       for (std::size_t j = 0; j < time_x.size(); j++) {
         traj.insert(traj.end(), traj_x.begin() + j * 4, traj_x.begin() + (j * 4 + 4));
         traj.insert(traj.end(), traj_y.begin() + j * 4, traj_y.begin() + (j * 4 + 4));
         input.insert(input.end(), {input_x[j], input_y[j]});
+        time.push_back(time_x[j]);
       }
       speeds_xy.push_back({speeds[index_x], speeds[index_y]});
-      template_primitives.push_back(std::make_tuple(time_x, traj, input));
+      template_primitives.push_back(std::make_tuple(time, traj, input));
       index_y++;
     }
     index_x++;
@@ -135,25 +139,22 @@ int main() {
   MotionPrimitive primitives;
 
   // Define Start and Goal
-  cspace::state_t x0 = {0, 0, 0, 0, 0, 0, 0, 0};
-  cspace::state_t xg = {0, 0, 0.5, 0, 0, 0, 0.5, 0};
+  cspace::state_t x0 = {0, 0, 0.0, 0, 0, 0, 0.0, 0};
+  cspace::state_t xg = {0, 0, 0.1, 0, 0, 0, 0.1, 0};
 
-  cspace::Options opt(21000, {
-                                 std::make_pair(0.0, 0.0),
-                                 std::make_pair(0.0, 0.0),
-                                 std::make_pair(-3, 3),
-                                 std::make_pair(-0.5, 0.5),
-                                 std::make_pair(0.0, 0.0),
-                                 std::make_pair(0.0, 0.0),
-                                 std::make_pair(-3, 3),
-                                 std::make_pair(-0.5, 0.5),
-                             });
+  cspace::Options opt(
+      30000, {
+                 std::make_pair(0.0, 0.0), std::make_pair(0.0, 0.0), std::make_pair(-0.1, 0.6),  // Position x
+                 std::make_pair(0, 0),                                                           // Speed x
+                 std::make_pair(0.0, 0.0), std::make_pair(0.0, 0.0), std::make_pair(-0.1, 0.6),  // Position y
+                 std::make_pair(0, 0),                                                           // Speed y
+             });
   // Define Metric (optional)
   auto metric = [xg](const std::shared_ptr<const std::vector<double>>& x,
                      const std::shared_ptr<const std::vector<double>>& u, const float& time) {
-    float timeCoeff = 0;
-    float inputCoeff = 0.0;
-    float distanceCoeff = 1.0;
+    float timeCoeff = 0.3;
+    float inputCoeff = 0.02;
+    float distanceCoeff = 1;
 
     // Calculate sum of the absolute values of u
     float absSumU = std::transform_reduce(
@@ -175,19 +176,17 @@ int main() {
   opt.sort_metric = metric;
 
   // Define Obstacles
-  // cspace::DynamicObstacle upper_cart({0.0, 0.0, 0, 0.01, 0, 0, 0.01, 0.01, 0, 0.0, 0.01, 0}, 4,
-  // move_obstacle,
-  //                                   x0);
-  // cspace::StaticObstacle block({0.5, 0.0, 0, 0.51, 0, 0, 0.51, 0.01, 0, 0.5, 0.01, 0}, 4);
-  // opt.dynamic_obstacles.push_back(upper_cart);
-  // opt.static_obstacles.push_back(block);
+  cspace::DynamicObstacle upper_cart({{0.0, 0.0, 0.0}}, move_obstacle, x0);
+  cspace::StaticObstacle block({{0.05, -0.05, 0}, {0.15, -0.05, 0}, {0.15, 0.05, 0}, {0.05, 0.05, 0}});
+  opt.dynamic_obstacles.push_back(upper_cart);
+  opt.static_obstacles.push_back(block);
 
   cspace::state_t x_test = {0, 0, 0.0, 0.1, 0, 0, 0.1, 0.0};
   auto primitives_x0 = primitives(x_test);
   std::cout << "Number of primitives: " << primitives_x0.size() << std::endl;
   // plot_states_and_input(std::get<0>(primitives_x0[1]), std::get<1>(primitives_x0[1]),
   //                       std::get<2>(primitives_x0[1]));
-  plot_primitives(primitives_x0);
+  // plot_primitives(primitives_x0);
 
   // Results
   auto [G, P] = cellBasedSearch(x0, xg, opt, primitives);
@@ -205,7 +204,7 @@ int main() {
   auto [input, time] = G.get_input(G.back().state);
   auto traj_from_input = simulate_system(x0, input, param::dt);
   // plot_graph(G, x0, xg);
-  plot_graph(G, x0, xg, traj);
+  plot_graph(G, x0, xg, traj, opt.static_obstacles);
   // plot_trajectory_time(traj, time);
   // plot_trajectory_flat(traj_from_input, time);
   // plot_input(input, time);
