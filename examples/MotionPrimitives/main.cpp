@@ -20,15 +20,14 @@ struct MotionPrimitive {
 };
 
 
-std::vector<double>& move_obstacle(std::vector<double>& obstacle, const cspace::state_t& x0,
+std::vector<std::vector<double>>& move_obstacle(std::vector<std::vector<double>>& obstacle, const cspace::state_t& x0,
                                   const cspace::state_t& xg) {
   double distance = xg[2] - x0[2];
 
   // 1D Movement
-  for (std::size_t i = 0; i < obstacle.size(); i += 3) {
-    obstacle[i] += distance;
+  for(auto& vertex : obstacle) {
+    vertex[0] += distance;
   }
-
   return obstacle;
 }
 
@@ -91,8 +90,8 @@ int main() {
                                 std::make_pair(-0.5, 0.5),
                             });
   // Define Obstacles
-  cspace::DynamicObstacle upper_cart({0.0, 0.0, 0, 0.01, 0, 0, 0.01, 0.01, 0, 0.0, 0.01, 0}, 4, move_obstacle,x0);
-  cspace::StaticObstacle block({0.5, 0.0, 0, 0.51, 0, 0, 0.51, 0.01, 0, 0.5, 0.01, 0}, 4);
+  cspace::DynamicObstacle upper_cart({{0.0, 0.0, 0}, {0.01, 0, 0}, {0.01, 0.01, 0}, {0.0, 0.01, 0}}, move_obstacle,x0);
+  cspace::StaticObstacle block({{0.5, 0.0, 0}, {0.51, 0, 0}, {0.51, 0.01, 0}, {0.5, 0.01, 0}});
   //opt.dynamic_obstacles.push_back(upper_cart);
   //opt.static_obstacles.push_back(block);
 
