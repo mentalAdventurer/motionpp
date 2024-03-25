@@ -16,5 +16,6 @@ using trajTuple = std::tuple<std::vector<double>, std::vector<double>, std::vect
 vec_double dynamics(cvec_double& x,double u);
 vec_double calculate_input(vec_double x0, cvec_double accel, double dt);
 vec_double simulate_system(vec_double x, cvec_double& inputs, double dt);
+std::pair<vec_double,vec_double> simulate_system2D(vec_double x, cvec_double& inputs, double time_end);
 trajTuple get_zv_trajectory(double start_position, double start_speed, double target_speed);
 #endif  // MODEL_H

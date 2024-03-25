@@ -40,6 +40,30 @@ vec_double simulate_system(vec_double x, cvec_double& inputs, double dt){
   return trajc;
 }
 
+std::pair<vec_double,vec_double> simulate_system2D(vec_double x, cvec_double& inputs, double time_end){
+  std::size_t num_points = inputs.size()/2;
+  double dt = time_end / num_points;
+  vec_double trajc(x.size()*(num_points+1),0);
+  vec_double time(num_points+1,0);
+
+  // init first state
+  std::copy(x.begin(),x.end(),trajc.begin());
+
+  for (std::size_t i = 0; i < num_points; i++){
+    time[i] = i*dt;
+    auto dxdt = dynamics(std::vector<double>(x.begin(),x.begin()+4),inputs[i*2]);
+    auto dxdt_y = dynamics(std::vector<double>(x.begin()+4,x.end()),inputs[i*2+1]);
+    dxdt.insert(dxdt.end(),dxdt_y.begin(),dxdt_y.end());
+    // calulate next state
+    for (std::size_t j = 0; j < x.size(); j++){
+      x[j] += dxdt[j] * dt;
+      trajc[(i+1)*x.size() + j] = x[j];
+    }
+  }
+  time[num_points] = time_end;
+  return {trajc,time};
+}
+
 trajTuple get_zv_trajectory(double start_position, double start_speed, double target_speed) {
   auto [times, speed, accel, jerk] =
       generate_scurve(start_speed, target_speed, param::accel_limit, param::jerk_limit, param::dt);

@@ -96,7 +96,8 @@ MotionPrimitive::MotionPrimitive() {
       for (std::size_t j = 0; j < time_x.size(); j++) {
         traj.insert(traj.end(), traj_x.begin() + j * 4, traj_x.begin() + (j * 4 + 4));
         traj.insert(traj.end(), traj_y.begin() + j * 4, traj_y.begin() + (j * 4 + 4));
-        input.insert(input.end(), {input_x[j], input_y[j]});
+        input.push_back(input_x[j]);
+        input.push_back(input_y[j]);
         time.push_back(time_x[j]);
       }
       speeds_xy.push_back({speeds[index_x], speeds[index_y]});
@@ -140,7 +141,7 @@ int main() {
 
   // Define Start and Goal
   cspace::state_t x0 = {0, 0, 0.0, 0, 0, 0, 0.0, 0};
-  cspace::state_t xg = {0, 0, 0.1, 0, 0, 0, 0.1, 0};
+  cspace::state_t xg = {0, 0, 0.2, 0, 0, 0, 0.0, 0};
 
   cspace::Options opt(
       30000, {
@@ -177,9 +178,11 @@ int main() {
 
   // Define Obstacles
   cspace::DynamicObstacle upper_cart({{0.0, 0.0, 0.0}}, move_obstacle, x0);
-  cspace::StaticObstacle block({{0.05, -0.05, 0}, {0.15, -0.05, 0}, {0.15, 0.05, 0}, {0.05, 0.05, 0}});
   opt.dynamic_obstacles.push_back(upper_cart);
+  cspace::StaticObstacle block({{0.05, -0.05, 0}, {0.15, -0.05, 0}, {0.15, 0.05, 0}, {0.05, 0.05, 0}});
   opt.static_obstacles.push_back(block);
+  //cspace::StaticObstacle block2({{0.05, 0.07, 0}, {0.15, 0.07, 0}, {0.15, 0.17, 0}, {0.05, 0.17, 0}});
+  //opt.static_obstacles.push_back(block2);
 
   cspace::state_t x_test = {0, 0, 0.0, 0.1, 0, 0, 0.1, 0.0};
   auto primitives_x0 = primitives(x_test);
@@ -202,10 +205,11 @@ int main() {
             << std::endl;
   trajectory_t traj = G.get_trajectory(G.back().state);
   auto [input, time] = G.get_input(G.back().state);
-  auto traj_from_input = simulate_system(x0, input, param::dt);
+  auto [traj_from_input,time_vec] = simulate_system2D(x0, input, time);
   // plot_graph(G, x0, xg);
   plot_graph(G, x0, xg, traj, opt.static_obstacles);
-  // plot_trajectory_time(traj, time);
+  plot_input(input,time);
+  plot_trajectory2D(traj_from_input,x0,xg,opt.static_obstacles);
   // plot_trajectory_flat(traj_from_input, time);
   // plot_input(input, time);
 

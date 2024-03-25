@@ -144,36 +144,50 @@ void plot_trajectory(const std::vector<std::vector<double>>& traj) {
   plt::show();
 }
 
-void plot_trajectory_time(const std::vector<std::vector<double>>& traj, const std::vector<double>& time) {
+void plot_trajectory2D(std::vector<double> traj, state_t x0, state_t xg, const std::vector<StaticObstacle>& obstacles) {
   namespace plt = matplot;
-  // Calculate Time
-  const double steps = traj.size();
-  const double dt = time.back() / steps;
 
-  std::vector<double> x;
-  std::vector<double> xp;
-  std::vector<double> z;
-  std::vector<double> zp;
+  // Repack
+  std::vector<double> xd, zd, x_x, xd_x, z_x, zd_x, x_y, xd_y, z_y, zd_y;
+  for (std::size_t i = 0; i < traj.size(); i += 8){
+    x_x.push_back(traj[i]);
+    xd_x.push_back(traj[i+1]);
+    z_x.push_back(traj[i+2]);
+    zd_x.push_back(traj[i+3]);
+    x_y.push_back(traj[i+4]);
+    xd_y.push_back(traj[i+5]);
+    z_y.push_back(traj[i+6]);
+    zd_y.push_back(traj[i+7]);
+  }
+  plt::tiledlayout(2, 1);
+  plt::nexttile();
+  plt::plot(z_x, z_y)->line_width(2);
+  plt::hold(true);
+  plt::plot({x0[2]}, {x0[6]}, "bx")->marker_size(15);
+  plt::plot({xg[2]}, {xg[6]}, "gx")->marker_size(15);
+  plt::grid(true);
+  plt::xlabel("z_x");
+  plt::ylabel("z_y");
 
-  for (auto& xi : traj) {
-    x.push_back(xi[0]);
-    xp.push_back(xi[1]);
-    z.push_back(xi[2]);
-    zp.push_back(xi[3]);
+  plt::nexttile();
+  plt::plot(zd_x)->line_width(2);
+  plt::hold(true);
+  plt::plot(zd_y,"-.")->line_width(2);
+  plt::grid(true);
+
+  // Plot the obstacles
+  for (auto obj : obstacles) {
+    std::vector<double> x, y;
+    for (auto& vertex : obj.polytope_data) {
+      x.push_back(vertex[0]);
+      y.push_back(vertex[1]);
+    }
+    // Close the Obstacle
+    x.push_back(obj.polytope_data[0][0]);
+    y.push_back(obj.polytope_data[0][1]);
+    //plt::plot(x, y, "r-")->line_width(2);
   }
 
-  // Create time vector size of s
-  std::vector<double> t(steps);
-  t[0] = 0;
-  for (auto it = t.begin() + 1; it != t.end(); it++) *it = *(it - 1) + dt;
-
-  plt::figure();
-  plt::plot(t, zp)->line_width(2);
-  plt::hold(true);
-  plt::plot(t, zp, ".")->marker_size(5);
-  plt::title("Trajectory");
-  plt::xlabel("Time (s)");
-  plt::ylabel("z_p");
   plt::show();
 }
 
@@ -262,7 +276,7 @@ void plot_trajectory_flat(const std::vector<double>& traj, double time_final) {
 
 void plot_input(cspace::input_trajectory_t input, double time_final) {
   namespace plt = matplot;
-  const double steps = input.size();
+  const double steps = input.size()/2;
   const double dt = time_final / steps;
   std::vector<double> t(steps);
   // initialize t
@@ -271,9 +285,17 @@ void plot_input(cspace::input_trajectory_t input, double time_final) {
     *it = t_curr;
     t_curr += dt;
   }
+  // Repackage the input
+  std::vector<double> input_x, input_y;
+  for (std::size_t i = 0; i < input.size(); i += 2) {
+    input_x.push_back(input[i]);
+    input_y.push_back(input[i + 1]);
+  }
 
   plt::figure();
-  plt::plot(t, input)->line_width(2);
+  plt::plot(t, input_x)->line_width(2);
+  plt::hold(true);
+  plt::plot(t, input_y)->line_width(2);
   plt::title("Input");
   plt::grid(true);
   plt::xlabel("Time (s)");
