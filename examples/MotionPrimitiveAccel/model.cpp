@@ -8,16 +8,18 @@ MotionPrimitives::MotionPrimitives() {
   time_impuls.reserve(accel.size());
 
   for (auto& a : accel) {
-    double delta_t = a / p::j_max;
+    double delta_t = std::abs(a / p::j_max);
     if (a == 0) {
       time_impuls.push_back({0, 0, 0, 0.05});
       jerk_impuls.push_back({0, 0, 0, 0});
     } else if (p::Tv < delta_t) {
       time_impuls.push_back({0, p::Tv, delta_t, p::Tv + delta_t});
       jerk_impuls.push_back({p::j_max * kappa0, p::j_max * kappa1, -p::j_max * kappa0, -p::j_max * kappa1});
+      if (a < 0) for(auto& jerk : jerk_impuls.back()) jerk *= -1;
     } else {
       time_impuls.push_back({0, delta_t, p::Tv, delta_t + p::Tv});
       jerk_impuls.push_back({p::j_max * kappa0, -p::j_max * kappa0, p::j_max * kappa1, -p::j_max * kappa1});
+      if (a < 0) for(auto& jerk : jerk_impuls.back()) jerk *= -1;
     }
   }
 }

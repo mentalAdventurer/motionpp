@@ -102,3 +102,52 @@ void plot_input(cspace::input_trajectory_t input, double time_final) {
   plt::xlabel("Time (s)");
   plt::show();
 }
+
+void plot_graph(Graph& G, cspace::state_t x0, cspace::state_t xg,
+                const std::vector<std::vector<double>>& traj = {},
+                const std::vector<cspace::StaticObstacle>& obstacles = {}) {
+  namespace plt = matplot;
+  std::vector<std::vector<double>> graph_repacked(8);
+
+  for (const auto& [states, out, in] : G) {
+    if (states->size() == 6) {
+      for (std::size_t i = 0; i < 6; i++) {
+        graph_repacked[i].push_back(states->at(i));
+      }
+    }
+  }
+  plt::figure();
+  plt::plot(graph_repacked[0], graph_repacked[3], ".")->marker_size(5);
+  plt::hold(true);
+  plt::plot({x0[0]}, {x0[3]}, "bx")->marker_size(15);
+  plt::plot({xg[0]}, {xg[3]}, "gx")->marker_size(15);
+  plt::grid(true);
+  plt::xlabel("z_x");
+  plt::ylabel("z_y");
+
+  // Plot the trajectory
+  if (!traj.empty()) {
+    std::vector<std::vector<double>> traj_repacked(6);
+    for (auto& xi : traj) {
+      for (std::size_t i = 0; i < 6; i++) {
+        traj_repacked[i].push_back(xi[i]);
+      }
+    }
+    plt::plot(traj_repacked[0], traj_repacked[3])->line_width(2);
+    plt::plot(traj_repacked[0], traj_repacked[3], ".")->marker_size(5);
+  }
+  // Plot the obstacles
+  for (auto obj : obstacles) {
+    std::vector<double> x, y;
+    for (auto& vertex : obj.polytope_data) {
+      x.push_back(vertex[0]);
+      y.push_back(vertex[1]);
+    }
+    // Close the Obstacle
+    x.push_back(obj.polytope_data[0][0]);
+    y.push_back(obj.polytope_data[0][1]);
+    plt::plot(x, y, "r-")->line_width(2);
+  }
+
+  plt::show();
+}
