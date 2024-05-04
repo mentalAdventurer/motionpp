@@ -3,7 +3,6 @@ project(Motionpp)
 
 # Options
 option(MOTIONPP_BUILD_EXAMPLES "Build MotionPP examples" OFF)
-option(MOTIONPP_BUILD_TESTS "Build MotionPP tests" OFF)
 
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 17)
@@ -18,15 +17,8 @@ else()
     add_compile_options(-Wall -Wno-unused-parameter -Wextra -pedantic)
 endif()
 
-# Enabel testing 
-include(CTest)
-
 # Add subdirectories
 add_subdirectory(external)
-
-if (MOTIONPP_BUILD_TESTS)
-    add_subdirectory(tests)
-endif()
 
 if (MOTIONPP_BUILD_EXAMPLES)
     add_subdirectory(examples)
