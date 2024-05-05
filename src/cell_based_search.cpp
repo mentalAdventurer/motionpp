@@ -41,7 +41,7 @@ std::pair<Graph, cspace::Voronoi> cellBasedSearch(const cspace::state_t& x0, con
                                                   cspace::fun_inputs generateInput,
                                                   cspace::fun_simulator simulator) {
   namespace cs = cspace;
-  cs::Voronoi P(opt.NumberOfPoints, x0, xg, opt.limits);
+  cs::Voronoi P(opt.NumberOfPoints, x0, xg, opt);
   cs::ReachedSet R(simulator, generateInput, opt);
   return cellBasedSearch(x0, xg, opt, R, P);
 }
@@ -50,7 +50,7 @@ std::pair<Graph, cspace::Voronoi> cellBasedSearch(const cspace::state_t& x0, con
                                                   const cspace::Options& opt,
                                                   cspace::fun_motion_primitive primitives) {
   namespace cs = cspace;
-  cs::Voronoi P(opt.NumberOfPoints, x0, xg, opt.limits);
+  cs::Voronoi P(opt.NumberOfPoints, x0, xg, opt);
   cs::ReachedSet R(primitives, opt);
   return cellBasedSearch(x0, xg, opt, R, P);
 }

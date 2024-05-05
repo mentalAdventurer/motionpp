@@ -3,6 +3,7 @@
 #include <KDTree.hpp>
 #include <random>
 #include <vector>
+#include <iostream>
 
 #include "annoylib.h"
 #include "kissrandom.h"
@@ -59,10 +60,11 @@ struct Options {
   std::size_t NumberOfPoints;
   StateLimits limits;
   metric_func sort_metric;
+  std::string sampling_method;
   std::vector<DynamicObstacle> dynamic_obstacles;
   std::vector<StaticObstacle> static_obstacles;
   Options(std::size_t NumberOfPoints, StateLimits limits)
-      : NumberOfPoints(NumberOfPoints), limits(limits), sort_metric(nullptr) {}
+      : NumberOfPoints(NumberOfPoints), limits(limits), sort_metric(nullptr), sampling_method("halton") {}
 };
 
 class Voronoi {
@@ -72,13 +74,17 @@ class Voronoi {
       tree;
   std::unique_ptr<KDTree> kdtree;
   Options::StateLimits limits;
+  Options opt;
   std::vector<state_t> points;
   std::vector<bool> points_visited;
   state_t random_state(const std::size_t state_dim);
+  std::vector<int> generate_primenumbers(std::size_t n);
+  double halton_sequence(int index, const int base, double lower_limit = 1, double upper_limit = 0);
+  state_t halton_state(const std::size_t state_dim, const int index);
   std::size_t xg_index;
 
  public:
-  Voronoi(const std::size_t N, state_t x0, state_t xg, const Options::StateLimits& limits);
+  Voronoi(const std::size_t N, state_t x0, state_t xg, Options options);
   Voronoi(const Voronoi&) = delete;
   Voronoi& operator=(const Voronoi&) = delete;
   Voronoi(Voronoi&& other) noexcept;

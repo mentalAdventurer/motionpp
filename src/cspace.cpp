@@ -61,8 +61,8 @@ StaticObstacle& StaticObstacle::operator=(StaticObstacle&& other) noexcept {
   return *this;
 }
 
-Voronoi::Voronoi(const std::size_t N, state_t x0, state_t xg, const Options::StateLimits& limits)
-    : tree(x0.size()), limits(limits) {
+Voronoi::Voronoi(const std::size_t N, state_t x0, state_t xg, Options options)
+    : tree(x0.size()), limits(options.limits), opt(options) {
   points.resize(N + 2);
   points[0] = x0;
 
@@ -72,8 +72,16 @@ Voronoi::Voronoi(const std::size_t N, state_t x0, state_t xg, const Options::Sta
 
   const std::size_t state_dim = x0.size();
 
-  // Generate N random points
-  for (std::size_t i = 0; i < N; i++) points[i + 2] = this->random_state(state_dim);
+  // Generate N points
+  if (opt.sampling_method == "random") {
+    for (std::size_t i = 0; i < N; i++) points[i + 2] = this->random_state(state_dim);
+  } else if (opt.sampling_method == "halton"){
+    for (std::size_t i = 0; i < N; i++) points[i + 2] = this->halton_state(state_dim, i);
+  } else {
+    std::cerr << "Invalid sampling method" << std::endl;
+    std::cerr << "Defaulting to halton sampling" << std::endl;
+    for (std::size_t i = 0; i < N; i++) points[i + 2] = this->halton_state(state_dim, i);
+  }
 
   // Initialize the points_visited vector
   points_visited.resize(points.size());
@@ -95,6 +103,7 @@ Voronoi::Voronoi(Voronoi&& other) noexcept
     : tree(other.points[0].size()),
       kdtree(std::move(other.kdtree)),
       limits(std::move(other.limits)),
+      opt(std::move(other.opt)),
       points(std::move(other.points)),
       points_visited(std::move(other.points_visited)),
       xg_index(other.xg_index) {
@@ -105,6 +114,7 @@ Voronoi& Voronoi::operator=(Voronoi&& other) noexcept {
   if (this != &other) {
     kdtree = std::move(other.kdtree);
     limits = other.limits;
+    opt = std::move(other.opt);
     points = std::move(other.points);
     points_visited = std::move(other.points_visited);
     xg_index = other.xg_index;
@@ -133,6 +143,53 @@ bool Voronoi::visit(state_t x) {
   // Mark the nearest point as visited
   points_visited[nearestIndex] = true;
   return true;
+}
+
+std::vector<int> Voronoi::generate_primenumbers(std::size_t n) {
+  // function should return the first n prime numbers
+  std::vector<int> primes;
+  int num = 2;
+  while (primes.size() < n) {
+    bool isPrime = true;
+    for (int i = 2; i <= num / 2; i++) {
+      if (num % i == 0) {
+        isPrime = false;
+        break;
+      }
+    }
+    if (isPrime) {
+      primes.push_back(num);
+    }
+    num++;
+  }
+  return primes;
+}
+
+double Voronoi::halton_sequence(int index, const int base, double lower_limit, double upper_limit) {
+  // Swap the limits if the lower limit is greater than the upper limit
+  if (lower_limit > upper_limit) {
+    double temp = lower_limit;
+    lower_limit = upper_limit;
+    upper_limit = temp;
+  }
+
+  double distance = std::abs(upper_limit - lower_limit);
+  double r = 0, f = distance;
+  while (index > 0) {
+    f = f / base;
+    r = r + f * (index % base);
+    index = index / base;
+  }
+  return r + lower_limit;
+}
+
+state_t Voronoi::halton_state(const std::size_t state_dim, const int index) {
+  static std::vector<int> primes = generate_primenumbers(state_dim);
+  state_t halton_state(state_dim);
+  for (std::size_t i = 0; i < state_dim; i++) {
+    halton_state[i] = halton_sequence(index, primes[i], limits[i].first, limits[i].second);
+  }
+  return halton_state;
 }
 
 state_t Voronoi::random_state(const std::size_t state_dim) {
