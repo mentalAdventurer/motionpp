@@ -75,7 +75,7 @@ Voronoi::Voronoi(const std::size_t N, state_t x0, state_t xg, Options options)
   // Generate N points
   if (opt.sampling_method == "random") {
     for (std::size_t i = 0; i < N; i++) points[i + 2] = this->random_state(state_dim);
-  } else if (opt.sampling_method == "halton"){
+  } else if (opt.sampling_method == "halton") {
     for (std::size_t i = 0; i < N; i++) points[i + 2] = this->halton_state(state_dim, i);
   } else {
     std::cerr << "Invalid sampling method" << std::endl;
@@ -87,6 +87,7 @@ Voronoi::Voronoi(const std::size_t N, state_t x0, state_t xg, Options options)
   points_visited.resize(points.size());
   std::fill(points_visited.begin(), points_visited.end(), false);
   points_visited[0] = true;  // Mark the initial point as visited
+  inTargetRadius = false;
 
   // Create the kdTree
   kdtree = std::make_unique<KDTree>(points);
@@ -138,6 +139,20 @@ bool Voronoi::visit(state_t x) {
   // Check if the point is already visited
   if (points_visited[nearestIndex]) {
     return false;
+  }
+
+  // Check if the point is in target radius
+  if (opt.target_radius > 0.0) {
+    double distance = 0.0;
+    if (opt.distance_metric == nullptr) {
+      // Default to Euclidean distance
+      for (std::size_t i = 0; i < x.size(); i++) distance += std::pow(x[i] - points[xg_index][i], 2);
+      distance = std::sqrt(distance);
+    } else {
+      // Use the provided distance metric
+      distance = opt.distance_metric(points[xg_index], x);
+    }
+    this->inTargetRadius = distance <= opt.target_radius;
   }
 
   // Mark the nearest point as visited
@@ -202,7 +217,8 @@ state_t Voronoi::random_state(const std::size_t state_dim) {
   }
   return randmo_vector;
 }
-bool Voronoi::target_reached() { return points_visited[xg_index]; }
+
+bool Voronoi::target_reached() { return points_visited[xg_index] || inTargetRadius; }
 auto Voronoi::begin() -> decltype(points.begin()) { return points.begin(); }
 auto Voronoi::end() -> decltype(points.end()) { return points.end(); }
 

@@ -1,9 +1,9 @@
 #ifndef CSPACE_H
 #define CSPACE_H
 #include <KDTree.hpp>
+#include <iostream>
 #include <random>
 #include <vector>
-#include <iostream>
 
 #include "annoylib.h"
 #include "kissrandom.h"
@@ -57,14 +57,22 @@ struct Options {
   using StateLimits = std::vector<std::pair<double, double>>;
   using metric_func =
       std::function<float(const cspace::state_ptr&, const cspace::input_traj_ptr&, const float&)>;
+  using distance_func = std::function<double(const cspace::state_t& state1, const cspace::state_t& state2)>;
   std::size_t NumberOfPoints;
+  double target_radius;
   StateLimits limits;
   metric_func sort_metric;
+  distance_func distance_metric;
   std::string sampling_method;
   std::vector<DynamicObstacle> dynamic_obstacles;
   std::vector<StaticObstacle> static_obstacles;
   Options(std::size_t NumberOfPoints, StateLimits limits)
-      : NumberOfPoints(NumberOfPoints), limits(limits), sort_metric(nullptr), sampling_method("halton") {}
+      : NumberOfPoints(NumberOfPoints),
+        target_radius(0),
+        limits(limits),
+        sort_metric(nullptr),
+        distance_metric(nullptr),
+        sampling_method("halton") {}
 };
 
 class Voronoi {
@@ -77,6 +85,7 @@ class Voronoi {
   Options opt;
   std::vector<state_t> points;
   std::vector<bool> points_visited;
+  bool inTargetRadius;
   state_t random_state(const std::size_t state_dim);
   std::vector<int> generate_primenumbers(std::size_t n);
   double halton_sequence(int index, const int base, double lower_limit = 1, double upper_limit = 0);
