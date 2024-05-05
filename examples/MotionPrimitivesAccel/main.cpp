@@ -9,10 +9,10 @@
 // Used for choosing next vertex for search
 float metric(const std::shared_ptr<const std::vector<double>>& x,
              const std::shared_ptr<const std::vector<double>>& u, const float& time) {
-  std::vector<double> xg = {0.2, 0, 0.0};
+  std::vector<double> xg = {0.3, 0, 0.0};
   float timeCoeff = 0.0;
-  float inputCoeff = 0.00;
-  float distanceCoeff = 0.09;
+  float inputCoeff = 0.000;
+  float distanceCoeff = 0.4;
 
   // Calculate sum of the absolute values of u
   float absSumU = std::transform_reduce(
@@ -24,7 +24,7 @@ float metric(const std::shared_ptr<const std::vector<double>>& x,
   float meanAbsU = absSumU / u->size();
 
   // Distance to goal
-  float distance = x->at(0) - xg[0];
+  float distance = std::abs(xg[0] - x->at(0));
 
   // Calculate the final cost
   float cost = timeCoeff * time + inputCoeff * meanAbsU + distanceCoeff * distance;
@@ -56,7 +56,7 @@ int main() {
   std::vector<double> xg = {0.3, 0, 0};
 
   // Define Search Options
-  cspace::Options opt(1e4,  // Number of Voronoi points
+  cspace::Options opt(1e5,  // Number of Voronoi points
                       {
                           // Region for spreading Voronoi points
                           {0.0, 0.5},  // Position x
@@ -64,6 +64,14 @@ int main() {
                           {0.0, 0},   // Accel x
                       });
   opt.sort_metric = metric;
+  opt.target_radius = 0.02;
+  opt.distance_metric = [](const cspace::state_t& x1, const cspace::state_t& x2) {
+      double distance = 0.0;
+      for (size_t i = 0; i < 2; i++) {
+          distance += std::pow(x1[i] - x2[i], 2);
+      }
+      return std::sqrt(distance);
+  };
 
   // Start search
   auto [G, P] = cellBasedSearch(x0, xg, opt, motion_primitives);
