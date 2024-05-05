@@ -1,5 +1,6 @@
 set(CMAKE_CXX_STANDARD 20)
 add_subdirectory(ElasticLinearDrive)
 add_subdirectory(MotionPrimitives)
+add_subdirectory(MotionPrimitivesAccel)
 add_subdirectory(2DMotionPrimitives)
-add_subdirectory(MotionPrimitiveAccel)
+add_subdirectory(2DMotionPrimitivesAccel)
