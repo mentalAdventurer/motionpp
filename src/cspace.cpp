@@ -61,27 +61,7 @@ StaticObstacle& StaticObstacle::operator=(StaticObstacle&& other) noexcept {
   return *this;
 }
 
-Voronoi::Voronoi(const std::size_t N, state_t x0, state_t xg, Options options)
-    : tree(x0.size()), limits(options.limits), opt(options) {
-  points.resize(N + 2);
-  points[0] = x0;
-
-  // Add the goal point to the points vector
-  this->xg_index = 1;  // Store index for check in target_reached()
-  points[xg_index] = xg;
-
-  const std::size_t state_dim = x0.size();
-
-  // Generate N points
-  if (opt.sampling_method == "random") {
-    for (std::size_t i = 0; i < N; i++) points[i + 2] = this->random_state(state_dim);
-  } else if (opt.sampling_method == "halton") {
-    for (std::size_t i = 0; i < N; i++) points[i + 2] = this->halton_state(state_dim, i);
-  } else {
-    std::cerr << "Invalid sampling method" << std::endl;
-    std::cerr << "Defaulting to halton sampling" << std::endl;
-    for (std::size_t i = 0; i < N; i++) points[i + 2] = this->halton_state(state_dim, i);
-  }
+void Voronoi::initialize(const std::size_t N, std::size_t state_dim) {
 
   // Initialize the points_visited vector
   points_visited.resize(points.size());
@@ -98,6 +78,49 @@ Voronoi::Voronoi(const std::size_t N, state_t x0, state_t xg, Options options)
   }
   tree.build(n_trees);
   tree.save("voronoi.tree");
+}
+
+Voronoi::Voronoi(const std::size_t N, state_t x0, state_t xg, Options options)
+    : tree(x0.size()), limits(options.limits), opt(options),xg(xg) {
+  points.resize(N + 2);
+  points[0] = x0;
+
+  // Add the goal point to the points vector
+  this->xg_index = 1;  // Store index for check in target_reached()
+  points[xg_index] = xg;
+  std::size_t state_dim = x0.size();
+
+  // Generate N points
+  if (opt.sampling_method == "random") {
+    for (std::size_t i = 0; i < N; i++) points[i + 2] = this->random_state(state_dim);
+  } else if (opt.sampling_method == "halton") {
+    for (std::size_t i = 0; i < N; i++) points[i + 2] = this->halton_state(state_dim, i);
+  } else {
+    std::cerr << "Invalid sampling method" << std::endl;
+    std::cerr << "Defaulting to halton sampling" << std::endl;
+    for (std::size_t i = 0; i < N; i++) points[i + 2] = this->halton_state(state_dim, i);
+  }
+
+  initialize(N, x0.size());
+}
+
+Voronoi::Voronoi(const std::size_t N, const std::size_t state_dim, Options options)
+    : tree(state_dim), limits(options.limits), opt(options) {
+
+  points.resize(N);
+
+  // Generate N points
+  if (opt.sampling_method == "random") {
+    for (std::size_t i = 0; i < N; i++) points[i] = this->random_state(state_dim);
+  } else if (opt.sampling_method == "halton") {
+    for (std::size_t i = 0; i < N; i++) points[i] = this->halton_state(state_dim, i);
+  } else {
+    std::cerr << "Invalid sampling method" << std::endl;
+    std::cerr << "Defaulting to halton sampling" << std::endl;
+    for (std::size_t i = 0; i < N; i++) points[i] = this->halton_state(state_dim, i);
+  }
+
+  initialize(N, state_dim);
 }
 
 Voronoi::Voronoi(Voronoi&& other) noexcept
@@ -124,6 +147,20 @@ Voronoi& Voronoi::operator=(Voronoi&& other) noexcept {
   return *this;
 }
 
+void Voronoi::new_query(const state_t x0, const state_t xg) {
+    this->xg = xg;
+    for (std::size_t i = 0; i < points.size(); i++) points_visited[i] = false; 
+    // Find Cell for x0
+    std::vector<int> nearestIndexVec;
+    tree.get_nns_by_vector(x0.data(), 1, search_k, &nearestIndexVec, nullptr);
+    int x0_index = nearestIndexVec[0];
+    points_visited[x0_index] = true;
+    // Find Cell for xg
+    nearestIndexVec.clear();
+    tree.get_nns_by_vector(xg.data(), 1, search_k, &nearestIndexVec, nullptr);
+    xg_index = nearestIndexVec[0];
+}
+
 bool Voronoi::visit(state_t x) {
   // Find the nearest neighbor to 'x' using the kdTree
   int nearestIndex = -1;
@@ -146,11 +183,11 @@ bool Voronoi::visit(state_t x) {
     double distance = 0.0;
     if (opt.distance_metric == nullptr) {
       // Default to Euclidean distance
-      for (std::size_t i = 0; i < x.size(); i++) distance += std::pow(x[i] - points[xg_index][i], 2);
+      for (std::size_t i = 0; i < x.size(); i++) distance += std::pow(x[i] - this->xg[i], 2);
       distance = std::sqrt(distance);
     } else {
       // Use the provided distance metric
-      distance = opt.distance_metric(points[xg_index], x);
+      distance = opt.distance_metric(this->xg, x);
     }
     this->inTargetRadius = distance <= opt.target_radius;
   }

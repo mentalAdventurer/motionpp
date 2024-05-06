@@ -86,6 +86,8 @@ class Voronoi {
   std::vector<state_t> points;
   std::vector<bool> points_visited;
   bool inTargetRadius;
+  state_t xg;
+  void initialize(const std::size_t N, const std::size_t dim);
   state_t random_state(const std::size_t state_dim);
   std::vector<int> generate_primenumbers(std::size_t n);
   double halton_sequence(int index, const int base, double lower_limit = 1, double upper_limit = 0);
@@ -94,10 +96,12 @@ class Voronoi {
 
  public:
   Voronoi(const std::size_t N, state_t x0, state_t xg, Options options);
+  Voronoi(const std::size_t N, const std::size_t dim, Options options);
   Voronoi(const Voronoi&) = delete;
   Voronoi& operator=(const Voronoi&) = delete;
   Voronoi(Voronoi&& other) noexcept;
   Voronoi& operator=(Voronoi&& other) noexcept;
+  void new_query(const state_t x0, const state_t xg);
   bool visit(state_t x);
   bool target_reached();
   auto begin() -> decltype(points.begin());
