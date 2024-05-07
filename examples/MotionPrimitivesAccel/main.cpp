@@ -74,7 +74,9 @@ int main() {
   };
 
   // Start search
-  auto [G, P] = cellBasedSearch(x0, xg, opt, motion_primitives);
+  MultiQuerySearch cellBasedSearch(x0.size(), opt, motion_primitives);
+  auto [G,P] = cellBasedSearch(x0, xg);
+
   auto trajectory = G.get_trajectory(G.back().state);
 
   // Terminal Info
