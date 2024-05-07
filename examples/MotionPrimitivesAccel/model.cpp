@@ -57,11 +57,11 @@ ZVStateInputTimeTuple MotionPrimitives::calculate_zv_from_impuls(std::span<const
 
     // Jerk times time
     std::vector<double> jerk_times_time = jerk_impuls;
-    for (std::size_t j = 0; j <= time_index; j++) jerk_times_time[j] *= time[i] - time_impuls[j];
+    for (std::size_t j = 0; j <= jerk_times_time.size(); j++) jerk_times_time[j] *= time[i] - time_impuls[j];
     std::vector<double> jerk_times_time_sq = jerk_times_time;
-    for (std::size_t j = 0; j <= time_index; j++) jerk_times_time_sq[j] *= 0.5 * (time[i] - time_impuls[j]);
+    for (std::size_t j = 0; j <= jerk_times_time_sq.size(); j++) jerk_times_time_sq[j] *= 0.5 * (time[i] - time_impuls[j]);
     std::vector<double> jerk_times_time_cu = jerk_times_time_sq;
-    for (std::size_t j = 0; j <= time_index; j++)
+    for (std::size_t j = 0; j <= jerk_times_time_cu.size(); j++)
       jerk_times_time_cu[j] *= 1 / 3.0 * (time[i] - time_impuls[j]);
 
     // position

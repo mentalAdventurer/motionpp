@@ -23,7 +23,7 @@ using primitiveTuple = std::tuple<std::vector<double>, std::vector<double>, std:
 using ZVStateInputTimeTuple = std::tuple<std::vector<double>, std::vector<double>, std::vector<double>>;
 
 struct MotionPrimitives {
-  double time_step = 1e-1;
+  double time_step = 1e-2;
   std::vector<double> accel = {-10,-5, 0.0,5, 10};
   std::vector<std::vector<double>> jerk_impuls;
   std::vector<std::vector<double>> time_impuls;
