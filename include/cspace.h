@@ -60,7 +60,8 @@ struct Options {
   using distance_func = std::function<double(const cspace::state_t& state1, const cspace::state_t& state2)>;
   std::size_t NumberOfPoints;
   double target_radius;
-  StateLimits limits;
+  StateLimits region_limits;
+  StateLimits state_limits;
   metric_func sort_metric;
   distance_func distance_metric;
   std::string sampling_method;
@@ -69,7 +70,7 @@ struct Options {
   Options(std::size_t NumberOfPoints, StateLimits limits)
       : NumberOfPoints(NumberOfPoints),
         target_radius(0),
-        limits(limits),
+        region_limits(limits),
         sort_metric(nullptr),
         distance_metric(nullptr),
         sampling_method("halton") {}

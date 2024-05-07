@@ -81,7 +81,7 @@ void Voronoi::initialize(const std::size_t N, std::size_t state_dim) {
 }
 
 Voronoi::Voronoi(const std::size_t N, state_t x0, state_t xg, Options options)
-    : tree(x0.size()), limits(options.limits), opt(options),xg(xg) {
+    : tree(x0.size()), limits(options.region_limits), opt(options), xg(xg) {
   points.resize(N + 2);
   points[0] = x0;
 
@@ -105,8 +105,7 @@ Voronoi::Voronoi(const std::size_t N, state_t x0, state_t xg, Options options)
 }
 
 Voronoi::Voronoi(const std::size_t N, const std::size_t state_dim, Options options)
-    : tree(state_dim), limits(options.limits), opt(options) {
-
+    : tree(state_dim), limits(options.region_limits), opt(options) {
   points.resize(N);
 
   // Generate N points
@@ -148,17 +147,17 @@ Voronoi& Voronoi::operator=(Voronoi&& other) noexcept {
 }
 
 void Voronoi::new_query(const state_t x0, const state_t xg) {
-    this->xg = xg;
-    for (std::size_t i = 0; i < points.size(); i++) points_visited[i] = false; 
-    // Find Cell for x0
-    std::vector<int> nearestIndexVec;
-    tree.get_nns_by_vector(x0.data(), 1, search_k, &nearestIndexVec, nullptr);
-    int x0_index = nearestIndexVec[0];
-    points_visited[x0_index] = true;
-    // Find Cell for xg
-    nearestIndexVec.clear();
-    tree.get_nns_by_vector(xg.data(), 1, search_k, &nearestIndexVec, nullptr);
-    xg_index = nearestIndexVec[0];
+  this->xg = xg;
+  for (std::size_t i = 0; i < points.size(); i++) points_visited[i] = false;
+  // Find Cell for x0
+  std::vector<int> nearestIndexVec;
+  tree.get_nns_by_vector(x0.data(), 1, search_k, &nearestIndexVec, nullptr);
+  int x0_index = nearestIndexVec[0];
+  points_visited[x0_index] = true;
+  // Find Cell for xg
+  nearestIndexVec.clear();
+  tree.get_nns_by_vector(xg.data(), 1, search_k, &nearestIndexVec, nullptr);
+  xg_index = nearestIndexVec[0];
 }
 
 bool Voronoi::visit(state_t x) {
@@ -309,16 +308,22 @@ bool ReachedSet::empty() { return states.empty(); }
 
 bool ReachedSet::collision(std::vector<double>::iterator begin, std::vector<double>::iterator end,
                            std::size_t state_dim) {
+  // Check if states is in limits
+  if (!opt.state_limits.empty())
+    for (auto it = begin; it < end; it += state_dim)
+      for (std::size_t i = 0; i < state_dim; i++)
+        if (*(it + i) < opt.state_limits[i].first || *(it + i) > opt.state_limits[i].second) return true;
+
+  // Collision Detection Obstacles
   if (opt.dynamic_obstacles.empty() || opt.static_obstacles.empty() || begin >= end) {
     return false;
   }
 
-  for (; begin < end; begin += state_dim) {
+  for (auto it = begin; it < end; it += state_dim) {
     for (auto& dynamicObstacle : opt.dynamic_obstacles) {
       // Transform the dynamic obstacle's polytope data based on the current state
-      dynamicObstacle.polytope_data =
-          dynamicObstacle.transform_obstacle(dynamicObstacle.polytope_data, dynamicObstacle.x_cur,
-                                             std::vector<double>(begin, begin + state_dim));
+      dynamicObstacle.polytope_data = dynamicObstacle.transform_obstacle(
+          dynamicObstacle.polytope_data, dynamicObstacle.x_cur, std::vector<double>(it, it + state_dim));
 
       for (auto& staticObstacle : opt.static_obstacles) {
         gkSimplex simplex;
