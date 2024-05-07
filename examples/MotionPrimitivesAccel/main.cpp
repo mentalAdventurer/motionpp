@@ -60,9 +60,15 @@ int main() {
                       {
                           // Region for spreading Voronoi points
                           {0.0, 0.5},  // Position x
-                          {0.0, 0.5},   // Speed x
+                          {0.0, 1.5},   // Speed x
                           {0.0, 0},   // Accel x
                       });
+  opt.state_limits = {
+      // State limits
+      {-.5, .5},  // Position x
+      {-1.5, 1.5},  // Speed x
+      {-1e3, 1e3},  // Accel x
+  };
   opt.sort_metric = metric;
   opt.target_radius = 0.02;
   opt.distance_metric = [](const cspace::state_t& x1, const cspace::state_t& x2) {
