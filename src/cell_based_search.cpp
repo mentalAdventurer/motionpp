@@ -59,12 +59,13 @@ MultiQuerySearch::MultiQuerySearch(std::size_t dim, const cspace::Options& opt,
                                    cspace::fun_motion_primitive primitives)
     : opt(opt), primitives(primitives), P(opt.NumberOfPoints, dim, opt), R(primitives, opt) {}
 
-std::pair<Graph, cspace::Voronoi> MultiQuerySearch::operator()(const cspace::state_t& x0,
+Graph MultiQuerySearch::operator()(const cspace::state_t& x0,
                                                                const cspace::state_t& xg) {
   namespace cs = cspace;
   cs::state_ptr x0_ptr = std::make_shared<const cs::state_t>(x0);
   Graph G(x0_ptr);
   Queue Q(x0_ptr, opt.sort_metric);
+  R.clear();
   P.new_query(x0, xg);
 
   // Start Main Loop
@@ -89,5 +90,5 @@ std::pair<Graph, cspace::Voronoi> MultiQuerySearch::operator()(const cspace::sta
   auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
   std::cout << "Time taken by function: " << duration.count() << " ms" << std::endl;
 
-  return {G, std::move(P)};
+  return G;
 }

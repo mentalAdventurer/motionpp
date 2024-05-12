@@ -23,7 +23,7 @@ std::pair<Graph, cspace::Voronoi> cellBasedSearch(const cspace::state_t& x0, con
 class MultiQuerySearch {
  public:
   MultiQuerySearch(std::size_t dim, const cspace::Options& opt, cspace::fun_motion_primitive primitives);
-  std::pair<Graph, cspace::Voronoi> operator()(const cspace::state_t& x0, const cspace::state_t& xg);
+  Graph operator()(const cspace::state_t& x0, const cspace::state_t& xg);
  private:
   cspace::Options opt;
   cspace::fun_motion_primitive primitives;

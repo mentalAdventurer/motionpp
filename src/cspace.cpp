@@ -158,6 +158,7 @@ void Voronoi::new_query(const state_t x0, const state_t xg) {
   nearestIndexVec.clear();
   tree.get_nns_by_vector(xg.data(), 1, search_k, &nearestIndexVec, nullptr);
   xg_index = nearestIndexVec[0];
+  inTargetRadius = false;
 }
 
 bool Voronoi::visit(state_t x) {
