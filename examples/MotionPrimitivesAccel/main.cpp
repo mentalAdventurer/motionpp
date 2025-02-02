@@ -81,7 +81,7 @@ int main() {
 
   // Start search
   MultiQuerySearch cellBasedSearch(x0.size(), opt, motion_primitives);
-  auto [G,P] = cellBasedSearch(x0, xg);
+  auto G = cellBasedSearch(x0, xg);
 
   auto trajectory = G.get_trajectory(G.back().state);
 
