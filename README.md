@@ -23,7 +23,7 @@ sudo pacman -S cmake gcc base-devel
 #### Build from source
 
 ```bash
-git clone --recursive https://git.uibk.ac.at/csba1368/motionplanning.git 
+git clone --recursive https://github.com/mentalAdventurer/motionpp
 cd motionplanning
 cmake -S . -B build
 cmake --build build
@@ -42,13 +42,13 @@ The easiest and recommended way to include `motionpp` in your project is to add 
 Clone the Motionpp repository into your project directory (make sure to replace the URL with the correct one for your repository):
 
 ```bash
-git clone --recursive https://git.uibk.ac.at/csba1368/motionplanning.git motionpp
+git clone --recursive https://github.com/mentalAdventurer/motionpp
 ```
 
 If you are using a git repository, you can add it as a submodule instead:
 
 ```bash
-git submodule add https://git.uibk.ac.at/csba1368/motionplanning.git motionpp
+git submodule add https://github.com/mentalAdventurer/motionpp
 git submodule update --init --recursive
 ```
 Include `motionpp` into your `CMake` build.
