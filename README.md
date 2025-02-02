@@ -35,7 +35,7 @@ If you want to build the examples and tests use the follwing flags:
 cmake -S . build -DMOTIONPP_BUILD_EXAMPLES=ON
 ```
 
-#### Recommended integration via `CMake`
+### Recommended integration via `CMake`
 
 The easiest and recommended way to include `motionpp` in your project is to add it as a subdirectory within your existing CMake-based build system.
 
