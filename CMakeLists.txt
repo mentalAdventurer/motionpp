@@ -29,7 +29,8 @@ add_library(${PROJECT_NAME} STATIC
     src/cell_based_search.cpp
     src/cspace.cpp 
     src/queue.cpp
-    src/graph.cpp) 
+    src/graph.cpp
+    src/helper.cpp)
 
 # Linking Libraries
 target_include_directories(${PROJECT_NAME} PUBLIC include)
